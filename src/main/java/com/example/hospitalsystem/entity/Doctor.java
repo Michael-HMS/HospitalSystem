@@ -1,5 +1,6 @@
-package com.example.hospitalsystem.model;
+package com.example.hospitalsystem.entity;
 
+import com.example.hospitalsystem.entity.enums.AvailabilityStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -9,8 +10,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,6 +27,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Doctor {
 
     @Id
@@ -31,37 +35,35 @@ public class Doctor {
     @Column(name = "doctor_id")
     private Integer doctorId;
 
-    @Column(name = "first_name", nullable = false, length = 50)
-    private String firstName;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    private User user;
 
-    @Column(name = "last_name", nullable = false, length = 50)
-    private String lastName;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "department_id", nullable = false)
+    private Department department;
 
     @Column(length = 100)
     private String specialization;
 
-    @Column(length = 10)
-    private String gender;
+    @Column(name = "license_number", unique = true, length = 100)
+    private String licenseNumber;
 
-    @Column(length = 20)
-    private String phone;
+    @Column(name = "years_of_experience")
+    private Integer yearsOfExperience;
 
-    @Column(unique = true, length = 100)
-    private String email;
+    @Column(name = "availability_status")
+    private AvailabilityStatus availabilityStatus;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "department_id")
-    private Department department;
-
-    @Column(nullable = false, length = 255)
-    private String password;
-
-    @OneToMany(mappedBy = "doctor")
+    @OneToMany(mappedBy = "doctor", fetch = FetchType.LAZY)
+    @Builder.Default
     private List<Appointment> appointments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "doctor")
+    @OneToMany(mappedBy = "doctor", fetch = FetchType.LAZY)
+    @Builder.Default
     private List<MedicalRecord> medicalRecords = new ArrayList<>();
 
-    @OneToMany(mappedBy = "doctor")
+    @OneToMany(mappedBy = "doctor", fetch = FetchType.LAZY)
+    @Builder.Default
     private List<Prescription> prescriptions = new ArrayList<>();
 }

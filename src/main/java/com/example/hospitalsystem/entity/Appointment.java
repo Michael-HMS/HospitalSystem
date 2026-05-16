@@ -1,24 +1,28 @@
-package com.example.hospitalsystem.model;
+package com.example.hospitalsystem.entity;
 
+import com.example.hospitalsystem.entity.enums.AppointmentStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "Appointment")
@@ -26,6 +30,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Appointment {
 
     @Id
@@ -33,11 +38,11 @@ public class Appointment {
     @Column(name = "appointment_id")
     private Integer appointmentId;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patient_id", nullable = false)
     private Patient patient;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "doctor_id", nullable = false)
     private Doctor doctor;
 
@@ -47,15 +52,19 @@ public class Appointment {
     @Column(name = "appointment_time", nullable = false)
     private LocalTime appointmentTime;
 
-    @Column(length = 50)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private AppointmentStatus status;
 
     @Column(columnDefinition = "TEXT")
-    private String notes;
+    private String reason;
 
-    @OneToMany(mappedBy = "appointment")
-    private List<MedicalRecord> medicalRecords = new ArrayList<>();
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "appointment")
-    private List<Bill> bills = new ArrayList<>();
+    @OneToOne(mappedBy = "appointment", fetch = FetchType.LAZY)
+    private MedicalRecord medicalRecord;
+
+    @OneToOne(mappedBy = "appointment", fetch = FetchType.LAZY)
+    private Bill bill;
 }

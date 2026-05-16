@@ -1,4 +1,4 @@
-package com.example.hospitalsystem.model;
+package com.example.hospitalsystem.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,37 +10,39 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "Prescription_Item")
+@Table(name = "Prescription_Detail")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PrescriptionItem {
+@Builder
+public class PrescriptionDetail {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "item_id")
-    private Integer itemId;
+    @Column(name = "detail_id")
+    private Integer detailId;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "prescription_id", nullable = false)
     private Prescription prescription;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "medication_id", nullable = false)
     private Medication medication;
 
-    @Column(length = 100)
+    @Column(nullable = false, length = 100)
     private String dosage;
 
     @Column(length = 100)
-    private String duration;
+    private String frequency;
 
-    @Column(columnDefinition = "TEXT")
-    private String instructions;
+    @Column(length = 100)
+    private String duration;
 }

@@ -1,0 +1,12 @@
+# Copy to application-local.properties (gitignored) and set env vars or edit values locally.
+# Run with: --spring.profiles.active=local
+#
+# PowerShell example:
+#   $env:DB_SERVICE_URI="jdbc:mysql://YOUR_HOST:PORT/defaultdb?sslMode=REQUIRED"
+#   $env:DB_USERNAME="avnadmin"
+#   $env:DB_PASSWORD="your-password-here"
+#   .\mvnw spring-boot:run "-Dspring-boot.run.arguments=--spring.profiles.active=local"
+
+spring.datasource.url=${DB_SERVICE_URI:jdbc:mysql://localhost:3306/HospitalManagementSystem?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC}
+spring.datasource.username=${DB_USERNAME:root}
+spring.datasource.password=${DB_PASSWORD:}
