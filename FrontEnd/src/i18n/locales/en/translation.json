@@ -1,0 +1,14 @@
+{
+    "hospitalName": "University Hospital",
+    "home": {
+        "home": {
+            "title": "Home",
+            "description": "Welcome to the Hospital Management System"
+        }
+    },
+    "footer": {
+        "rightsReserved": "All rights reserved"
+    },
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode"
+}

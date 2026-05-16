@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: var(--primary);
+  --color-slate: var(--slate);
+  --color-dark-slate: var(--dark-slate);
+  --color-background: var(--background);
+  --color-text-base: var(--text-base);
+}
+
+:root {
+  --primary: #0a2e46;
+  --slate: #677893;
+  --dark-slate: #45566f;
+  --background: #f8f9fa;
+  --text-base: #0a2e46;
+}
+
+
+.dark {
+  --primary: #ffffff;
+  --slate: #94a3b8;
+  --dark-slate: #cbd5e1;
+  --background: #0b1528;
+  --text-base: #f8f9fa;
+}
