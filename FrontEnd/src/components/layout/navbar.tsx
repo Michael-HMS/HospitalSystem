@@ -2,6 +2,7 @@ import { useTheme } from "../../hooks/useTheme";
 import { useLanguage } from "../../hooks/useLanguage";
 import Button from "../ui/button";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 
 export default function Navbar() {
     const { theme, toggleTheme } = useTheme();
@@ -28,6 +29,11 @@ export default function Navbar() {
                 <Button variant="secondary" size="small" onClick={toggleTheme}>
                     {theme === "light" ? t("darkMode") : t("lightMode")}
                 </Button>
+
+                <Button variant="secondary" size="small" link="/not-found">
+                    not found
+                </Button>
+
             </div>
         </nav>
     );

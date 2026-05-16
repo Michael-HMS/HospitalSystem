@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 
-// 1. Enforce strict types for your variants to ensure the dictionary objects stay sync'd
 type ButtonVariant = "primary" | "secondary";
 type ButtonSize = "small" | "medium" | "large";
 
@@ -102,7 +101,6 @@ export default function Button({
                 className={baseClasses}
                 aria-disabled={isDisabled}
                 tabIndex={isDisabled ? -1 : undefined}
-                {...(restProps as any)} 
             >
                 {content}
             </Link>

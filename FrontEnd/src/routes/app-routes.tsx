@@ -1,10 +1,12 @@
-import { createBrowserRouter } from "react-router-dom";
 import Home from "../components/features/home/home";
-const router = createBrowserRouter([
-    {
-        path: "/",
-        element: <Home />,
-    },
-]);
+import NotFound from "../components/features/404";
+import { Route, Routes } from "react-router-dom";
 
-export default router;
+export default function AppRoutes() {
+    return (
+        <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="*" element={<NotFound />} />
+        </Routes>
+    );
+}
