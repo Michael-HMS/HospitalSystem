@@ -1,7 +1,7 @@
 import type { IPatient, IDoctor } from "../interfaces/IUser";
 
 
-const doctorsArray: IDoctor[] = [
+ const doctorsArray: IDoctor[] = [
     {
         doctor_id: 1,
         user_id: 1,
