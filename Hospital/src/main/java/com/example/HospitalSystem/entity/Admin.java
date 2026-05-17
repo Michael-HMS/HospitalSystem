@@ -17,13 +17,8 @@ public class Admin {
     @Column(name = "admin_id")
     private Integer adminId;
 
-    @Column(nullable = false, length = 100)
-    private String name;
-
-    @Column(nullable = false, unique = true, length = 150)
-    private String email;
-
-    @Column(name = "password_hash", nullable = false, length = 255)
-    private String password;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    private User user;
 
 }
