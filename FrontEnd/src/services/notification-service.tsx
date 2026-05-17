@@ -1,58 +1,35 @@
 import type { INotification } from "../interfaces/INotifications";
-
-const notificationsArray: INotification[] = [
-    {
-        notification_id: 1,
-        user_id: 1,
-        title: "Notification 1",
-        message: "Message 1",
-        is_read: false,
-        created_at: "2022-01-01"
-    }
-];
+// import { api } from "../lib/api";
+import { mockNotifications } from "../lib/mockData";
 
 export class NotificationsService {
     static async getAllNotifications(): Promise<INotification[]> {
-        return notificationsArray;
+        return mockNotifications;
+        // return await api.get("/notifications");
     }
-    static async getNotificationById(id: number): Promise<INotification> {
-        return notificationsArray.find((notification) => notification.notification_id === id)!;
-    }
-    static async createNotification(notification: INotification): Promise<INotification> {
-        notificationsArray.push(notification);
-        return notification;
-    }
-    static async updateNotification(notification: INotification): Promise<INotification> {
-        const index = notificationsArray.findIndex((notification) => notification.notification_id === notification.notification_id);
-        notificationsArray[index] = notification;
-        return notification;
-    }
-    static async deleteNotification(notification_id: number): Promise<void> {
-        const index = notificationsArray.findIndex((notification) => notification.notification_id === notification_id);
-        notificationsArray.splice(index, 1);
-    }
-    //     static async getAllNotifications(): Promise<INotification[]> {
-    //         const response = await api.get("/notifications");
-    //         return response.data;
-    //     }
 
-    //     static async getNotificationById(id: number): Promise<INotification> {
-    //         const response = await api.get(`/notifications/${id}`);
-    //         return response.data;
-    //     }
-    
-    //     static async createNotification(notification: INotification): Promise<INotification> {
-    //         const response = await api.post("/notifications", notification);
-    //         return response.data;
-    //     }
-    
-    //     static async updateNotification(notification: INotification): Promise<INotification> {
-    //         const response = await api.put(`/notifications/${notification.notification_id}`, notification);
-    //         return response.data;
-    //     }
-    
-    //     static async deleteNotification(notification_id: number): Promise<void> {
-    //         const response = await api.delete(`/notifications/${notification_id}`);
-    //         return response.data;
-    //     }
+    static async getNotificationById(id: number): Promise<INotification> {
+        return mockNotifications.find(n => n.notification_id === id)!;
+        // return await api.get(`/notifications/${id}`);
+    }
+
+    static async createNotification(notification: Partial<INotification>): Promise<INotification> {
+        const newNotif = { ...notification, notification_id: Date.now() } as INotification;
+        mockNotifications.push(newNotif);
+        return newNotif;
+        // return await api.post("/notifications", notification);
+    }
+
+    static async updateNotification(notification: Partial<INotification>): Promise<INotification> {
+        const index = mockNotifications.findIndex(n => n.notification_id === notification.notification_id);
+        if (index !== -1) mockNotifications[index] = { ...mockNotifications[index], ...notification } as INotification;
+        return mockNotifications[index];
+        // return await api.put(`/notifications/${notification.notification_id}`, notification);
+    }
+
+    static async deleteNotification(notification_id: number): Promise<void> {
+        const index = mockNotifications.findIndex(n => n.notification_id === notification_id);
+        if (index !== -1) mockNotifications.splice(index, 1);
+        // return await api.delete(`/notifications/${notification_id}`);
+    }
 }
