@@ -52,6 +52,9 @@ public class Patient {
     @Column(name = "medical_history", columnDefinition = "TEXT")
     private String medicalHistory;
 
+    @Column(name = "credit", length = 20)
+    private String credit;
+
     @OneToMany(mappedBy = "patient", fetch = FetchType.LAZY)
     @Builder.Default
     private List<Appointment> appointments = new ArrayList<>();

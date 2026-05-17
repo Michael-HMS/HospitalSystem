@@ -1,9 +1,7 @@
-package com.example.HospitalSystem.controller;
+﻿package com.example.HospitalSystem.controller;
 
 import com.example.HospitalSystem.dto.AppointmentResponse;
 import com.example.HospitalSystem.dto.DoctorDashboardResponse;
-import com.example.HospitalSystem.dto.DoctorRegisterRequest;
-import com.example.HospitalSystem.dto.DoctorResponse;
 import com.example.HospitalSystem.dto.MedicalRecordRequest;
 import com.example.HospitalSystem.dto.MedicalRecordResponse;
 import com.example.HospitalSystem.dto.PatientProfileResponse;
@@ -31,19 +29,19 @@ import java.util.List;
 /**
  * REST controller for all Doctor use-case endpoints.
  *
- * Module 1 — Dashboard : GET /api/doctors/{id}/dashboard
- * Module 2 — Patient Records : GET /api/doctors/{id}/patients/{pid}/profile
- * GET /api/doctors/{id}/patients/{pid}/medical-history
- * Module 3 — Appointments : GET /api/doctors/{id}/appointments
- * PATCH /api/doctors/{id}/appointments/{aid}/status
- * Module 4 — Diagnosis : POST /api/doctors/{id}/medical-records
- * PUT /api/doctors/{id}/medical-records/{rid}
- * Module 5 — Prescriptions : POST /api/doctors/{id}/prescriptions
- * GET /api/doctors/{id}/patients/{pid}/prescriptions
- * Module 6 — Test Results : GET /api/doctors/{id}/patients/{pid}/test-results
- * GET /api/doctors/{id}/medical-records/{rid}/test-results
- * PATCH /api/doctors/{id}/test-results/{tid}/notes
- * Availability : PATCH /api/doctors/{id}/availability
+ * Module 1 ΓÇö Dashboard         : GET  /api/doctors/{id}/dashboard
+ * Module 2 ΓÇö Patient Records   : GET  /api/doctors/{id}/patients/{pid}/profile
+ *                                GET  /api/doctors/{id}/patients/{pid}/medical-history
+ * Module 3 ΓÇö Appointments      : GET  /api/doctors/{id}/appointments
+ *                                PATCH /api/doctors/{id}/appointments/{aid}/status
+ * Module 4 ΓÇö Diagnosis         : POST /api/doctors/{id}/medical-records
+ *                                PUT  /api/doctors/{id}/medical-records/{rid}
+ * Module 5 ΓÇö Prescriptions     : POST /api/doctors/{id}/prescriptions
+ *                                GET  /api/doctors/{id}/patients/{pid}/prescriptions
+ * Module 6 ΓÇö Test Results      : GET  /api/doctors/{id}/patients/{pid}/test-results
+ *                                GET  /api/doctors/{id}/medical-records/{rid}/test-results
+ *                                PATCH /api/doctors/{id}/test-results/{tid}/notes
+ * Availability                 : PATCH /api/doctors/{id}/availability
  */
 @RestController
 @RequestMapping("/api/doctors")
@@ -56,31 +54,7 @@ public class DoctorController {
     }
 
     // =========================================================================
-    // Onboarding & Search APIs
-    // =========================================================================
-
-    // Promote a registered User to a Doctor Profile
-    @PostMapping("/onboard")
-    public ResponseEntity<DoctorResponse> onboardDoctor(@RequestBody DoctorRegisterRequest request) {
-        return ResponseEntity.ok(doctorService.onboardDoctor(request));
-    }
-
-    // Search for a doctor (Patient uses this)
-    @GetMapping("/search")
-    public ResponseEntity<List<DoctorResponse>> searchDoctors(
-            @RequestParam(value = "keyword", required = false) String keyword) {
-        List<DoctorResponse> result = doctorService.searchDoctors(keyword);
-        return ResponseEntity.ok(result);
-    }
-
-    // Get all doctors
-    @GetMapping
-    public ResponseEntity<List<DoctorResponse>> getAllDoctors() {
-        return ResponseEntity.ok(doctorService.getAllDoctors());
-    }
-
-    // =========================================================================
-    // Module 1 — Doctor Dashboard
+    // Module 1 ΓÇö Doctor Dashboard
     // =========================================================================
 
     /**
@@ -93,13 +67,12 @@ public class DoctorController {
     }
 
     // =========================================================================
-    // Module 2 — Patient Records Management
+    // Module 2 ΓÇö Patient Records Management
     // =========================================================================
 
     /**
      * GET /api/doctors/{doctorId}/patients/{patientId}/profile
-     * Returns the patient's full profile: demographics, blood type, allergies,
-     * history.
+     * Returns the patient's full profile: demographics, blood type, allergies, history.
      */
     @GetMapping("/{doctorId}/patients/{patientId}/profile")
     public ResponseEntity<PatientProfileResponse> getPatientProfile(
@@ -120,7 +93,7 @@ public class DoctorController {
     }
 
     // =========================================================================
-    // Module 3 — Appointment Management
+    // Module 3 ΓÇö Appointment Management
     // =========================================================================
 
     /**
@@ -136,12 +109,10 @@ public class DoctorController {
     }
 
     /**
-     * PATCH
-     * /api/doctors/{doctorId}/appointments/{appointmentId}/status?target=Confirmed
+     * PATCH /api/doctors/{doctorId}/appointments/{appointmentId}/status?target=Confirmed
      * Updates appointment status: Confirmed, Completed, or Cancelled.
      *
-     * Uses Factory Method pattern internally to select the correct transition
-     * handler.
+     * Uses Factory Method pattern internally to select the correct transition handler.
      * Uses Bridge pattern to notify the patient after the status change.
      */
     @PatchMapping("/{doctorId}/appointments/{appointmentId}/status")
@@ -154,7 +125,7 @@ public class DoctorController {
     }
 
     // =========================================================================
-    // Module 4 — Diagnosis and Treatment
+    // Module 4 ΓÇö Diagnosis and Treatment
     // =========================================================================
 
     /**
@@ -171,8 +142,7 @@ public class DoctorController {
 
     /**
      * PUT /api/doctors/{doctorId}/medical-records/{recordId}
-     * Updates an existing medical record — e.g., adds notes after lab results
-     * arrive.
+     * Updates an existing medical record ΓÇö e.g., adds notes after lab results arrive.
      */
     @PutMapping("/{doctorId}/medical-records/{recordId}")
     public ResponseEntity<MedicalRecordResponse> updateMedicalRecord(
@@ -183,7 +153,7 @@ public class DoctorController {
     }
 
     // =========================================================================
-    // Module 5 — Prescription Management
+    // Module 5 ΓÇö Prescription Management
     // =========================================================================
 
     /**
@@ -210,7 +180,7 @@ public class DoctorController {
     }
 
     // =========================================================================
-    // Module 6 — Medical Reports and Test Results
+    // Module 6 ΓÇö Medical Reports and Test Results
     // =========================================================================
 
     /**

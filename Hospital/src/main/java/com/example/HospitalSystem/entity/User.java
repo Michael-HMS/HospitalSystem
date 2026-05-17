@@ -82,6 +82,9 @@ public class User {
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
     private Doctor doctor;
 
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    private Admin admin;
+
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @Builder.Default
     private List<Notification> notifications = new ArrayList<>();
