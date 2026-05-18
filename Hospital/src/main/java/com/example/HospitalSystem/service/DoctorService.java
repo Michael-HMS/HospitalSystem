@@ -3,7 +3,7 @@ package com.example.HospitalSystem.service;
 import com.example.HospitalSystem.dto.AppointmentResponse;
 import com.example.HospitalSystem.dto.DoctorDashboardResponse;
 import com.example.HospitalSystem.dto.DoctorRegisterRequest;
-import com.example.HospitalSystem.dto.DoctorResponse;
+import com.example.HospitalSystem.dto.DoctorDto;
 import com.example.HospitalSystem.dto.MedicalRecordRequest;
 import com.example.HospitalSystem.dto.MedicalRecordResponse;
 import com.example.HospitalSystem.dto.PatientProfileResponse;
@@ -38,6 +38,7 @@ import com.example.HospitalSystem.repository.PatientRepository;
 import com.example.HospitalSystem.repository.PrescriptionRepository;
 import com.example.HospitalSystem.repository.TestResultRepository;
 import com.example.HospitalSystem.repository.UserRepository;
+import com.example.HospitalSystem.mapper.DoctorMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,6 +73,7 @@ public class DoctorService {
         private final TestResultRepository testResultRepository;
         private final UserRepository userRepository;
         private final DepartmentRepository departmentRepository;
+        private final DoctorMapper doctorMapper;
 
         private final MessageSender messageSender;
 
@@ -84,6 +86,7 @@ public class DoctorService {
                         TestResultRepository testResultRepository,
                         UserRepository userRepository,
                         DepartmentRepository departmentRepository,
+                        DoctorMapper doctorMapper,
                         @Qualifier("emailSender") MessageSender messageSender) {
                 this.doctorRepository = doctorRepository;
                 this.patientRepository = patientRepository;
@@ -94,10 +97,11 @@ public class DoctorService {
                 this.testResultRepository = testResultRepository;
                 this.userRepository = userRepository;
                 this.departmentRepository = departmentRepository;
+                this.doctorMapper = doctorMapper;
                 this.messageSender = messageSender;
         }
 
-        public DoctorResponse onboardDoctor(DoctorRegisterRequest request) {
+        public DoctorDto onboardDoctor(DoctorRegisterRequest request) {
                 User user = userRepository.findById(request.getUserId())
                                 .orElseThrow(() -> new RuntimeException(
                                                 "User not found with ID: " + request.getUserId()));
@@ -128,39 +132,25 @@ public class DoctorService {
                                 .build();
 
                 Doctor savedDoctor = doctorRepository.save(doctor);
-                return mapToResponse(savedDoctor);
+                return doctorMapper.entityToDto(savedDoctor);
         }
 
-        public List<DoctorResponse> searchDoctors(String keyword) {
+        // Notice how we use the DTO mapper here to hide sensitive info like licenseNumber!
+        public List<DoctorDto> searchDoctors(String keyword) {
                 if (keyword == null || keyword.trim().isEmpty()) {
                         return doctorRepository.findAll().stream()
-                                        .map(this::mapToResponse)
+                                        .map(doctorMapper::entityToDto)
                                         .collect(Collectors.toList());
                 }
                 return doctorRepository.searchDoctors(keyword.trim()).stream()
-                                .map(this::mapToResponse)
+                                .map(doctorMapper::entityToDto)
                                 .collect(Collectors.toList());
         }
 
-        public List<DoctorResponse> getAllDoctors() {
+        public List<DoctorDto> getAllDoctors() {
                 return doctorRepository.findAll().stream()
-                                .map(this::mapToResponse)
+                                .map(doctorMapper::entityToDto)
                                 .collect(Collectors.toList());
-        }
-
-        private DoctorResponse mapToResponse(Doctor doctor) {
-                return DoctorResponse.builder()
-                                .doctorId(doctor.getDoctorId())
-                                .firstName(doctor.getUser().getFirstName())
-                                .lastName(doctor.getUser().getLastName())
-                                .email(doctor.getUser().getEmail())
-                                .specialization(doctor.getSpecialization())
-                                .departmentName(doctor.getDepartment() != null
-                                                ? doctor.getDepartment().getDepartmentName()
-                                                : null)
-                                .yearsOfExperience(doctor.getYearsOfExperience())
-                                .availabilityStatus(doctor.getAvailabilityStatus())
-                                .build();
         }
 
         // =========================================================================
