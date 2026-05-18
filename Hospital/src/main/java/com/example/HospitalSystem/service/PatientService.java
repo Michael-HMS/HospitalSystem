@@ -233,7 +233,7 @@ public class PatientService {
                     HttpStatus.UNAUTHORIZED, "Authentication required");
         }
 
-        User user = userRepository.findByEmail(requesterEmail)
+        User user = userRepository.findByEmailIgnoreCase(requesterEmail)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.UNAUTHORIZED, "User not found for token subject"));
 

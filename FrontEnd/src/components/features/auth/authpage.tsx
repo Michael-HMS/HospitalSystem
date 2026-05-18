@@ -108,8 +108,9 @@ const AuthPage: React.FC = () => {
 
   // ── Validators (same as login and register) ──
   const validateEmail = (email: string) => {
-    if (!email) return "Email is required"
-    if (!/\S+@\S+\.\S+/.test(email) || /[A-Z]/.test(email) || /^[0-9]/.test(email) || /^[^a-zA-Z_]/.test(email)) return "Enter a valid email"
+    const normalizedEmail = email.trim()
+    if (!normalizedEmail) return "Email is required"
+    if (!/^\S+@\S+\.\S+$/.test(normalizedEmail)) return "Enter a valid email"
     return ""
   }
 
@@ -123,11 +124,7 @@ const AuthPage: React.FC = () => {
   const validateLogin = () => {
     const errs = {
       email: validateEmail(loginData.email),
-      password: !loginData.password
-        ? "Password is required"
-        : loginData.password.length < 8
-        ? "Password must be at least 8 characters"
-        : "",
+      password: !loginData.password ? "Password is required" : "",
     }
     setLoginErrors(errs)
     return !errs.email && !errs.password
@@ -374,7 +371,7 @@ const AuthPage: React.FC = () => {
                       setApiError("")
                       setIsSubmitting(true)
                       try {
-                        const res = await AuthService.login(loginData.email, loginData.password)
+                        const res = await AuthService.login(loginData.email.trim(), loginData.password)
                         AuthService.storeSession(res.token, res.role, res.user)
                         navigate("/home", { state: { registered: true } })
                       } catch (err) {

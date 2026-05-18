@@ -41,7 +41,13 @@ public class AuthController {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            String email = request.getEmail() == null ? "" : request.getEmail().trim();
+            if (email.isEmpty()) {
+                response.put("error", "Email is required");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+
+            if (userRepository.findByEmailIgnoreCase(email).isPresent()) {
                 response.put("error", "Email is already registered");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
@@ -57,7 +63,7 @@ public class AuthController {
                 newUser.setLastName("");
             }
 
-            newUser.setEmail(request.getEmail());
+            newUser.setEmail(email);
             String hashedPassword = BCrypt.hashpw(request.getPassword(), BCrypt.gensalt());
             newUser.setPasswordHash(hashedPassword);
             newUser.setRole(UserRole.Patient);
@@ -91,15 +97,15 @@ public class AuthController {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            String email = request.getEmail();
+            String email = request.getEmail() == null ? "" : request.getEmail().trim();
             String password = request.getPassword();
 
-            Optional<User> userOpt = userRepository.findByEmail(email);
+            Optional<User> userOpt = userRepository.findByEmailIgnoreCase(email);
             if (userOpt.isPresent()) {
                 User user = userOpt.get();
                 if (BCrypt.checkpw(password, user.getPasswordHash())) {
                     String roleName = user.getRole().name();
-                    String token = jwtUtil.generateToken(email, roleName);
+                    String token = jwtUtil.generateToken(user.getEmail(), roleName);
 
                     HttpHeaders headers = new HttpHeaders();
                     headers.set("Authorization", "Bearer " + token);
@@ -108,7 +114,7 @@ public class AuthController {
                     response.put("role", roleName);
 
                     Map<String, Object> userData = new HashMap<>();
-                    userData.put("email", email);
+                    userData.put("email", user.getEmail());
                     userData.put("id", user.getUserId());
                     userData.put("firstName", user.getFirstName());
                     userData.put("lastName", user.getLastName());
