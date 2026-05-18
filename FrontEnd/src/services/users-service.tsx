@@ -149,4 +149,8 @@ export class UsersService {
     static async deleteUser(id: number): Promise<void> {
         await api.delete(`/admin/users/${id}`);
     }
+
+    static async getDashboardStats(): Promise<{ totalPatients: number; totalDoctors: number; totalAppointments: number }> {
+        return await api.get('/admin/users/dashboard-stats');
+    }
 }

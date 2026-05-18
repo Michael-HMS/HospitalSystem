@@ -1,5 +1,6 @@
 import Home from "../components/features/home/home";
 import NotFound from "../components/features/notFound/404";
+import Forbidden from "../components/features/notFound/403";
 import { Route, Routes } from "react-router-dom";
 import DepartmentsPage from "../components/features/hospital/departments/departmentList";
 import DoctorsPage from "../components/features/hospital/doctors/doctorsList";
@@ -26,6 +27,7 @@ export default function AppRoutes() {
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/departments" element={<DepartmentsPage />} />
             <Route path="/doctors" element={<DoctorsPage />} />
+            <Route path="/403" element={<Forbidden />} />
             <Route path="*" element={<NotFound />} />
 
             {/* Authenticated Routes (Any logged-in user) */}

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { AppointmentsService } from "../../../../services/appointment-service";
-import { DoctorsService } from "../../../../services/users-service";
+import { MedicalRecordsService } from "../../../../services/medical-service";
+import { AuthService } from "../../../../services/auth-service";
 import { TiHeartOutline, TiDocumentText, TiCalendar, TiUser } from "react-icons/ti";
 
 export default function MedicalHistoryPage() {
@@ -17,18 +17,12 @@ export default function MedicalHistoryPage() {
   useEffect(() => {
     const loadHistory = async () => {
       try {
-        const [appsData, docsData] = await Promise.all([
-          AppointmentsService.getAllAppointments(),
-          DoctorsService.getAllDoctors()
-        ]);
+        const patientId = Number(AuthService.getProfileId());
+        if (!patientId) return;
 
-        // Filter for this patient's appointments containing valid diagnostics records
-        const historicalData = (appsData || [])
-          .filter((app) => Number(app.patient_id) === loggedInPatientId && app.medical_record)
-          .sort((a, b) => new Date(b.appointment_date).getTime() - new Date(a.appointment_date).getTime());
+        const historicalData = await MedicalRecordsService.getMedicalRecordsByPatient(patientId);
 
         setRecords(historicalData);
-        setDoctors(docsData || []);
       } catch (error) {
         console.error("Error loading history:", error);
       } finally {
@@ -54,19 +48,18 @@ export default function MedicalHistoryPage() {
       ) : (
         <div className="space-y-4">
           {records.map((rec) => {
-            const doc = doctors.find((d) => Number(d.doctor_id) === Number(rec.doctor_id));
             return (
-              <div key={rec.appointment_id} className="bg-background border border-slate/15 rounded-2xl p-5 flex flex-col md:flex-row gap-4 items-start shadow-sm">
+              <div key={rec.record_id} className="bg-background border border-slate/15 rounded-2xl p-5 flex flex-col md:flex-row gap-4 items-start shadow-sm">
                 
                 {/* Meta Timeline Info */}
                 <div className="space-y-1.5 md:w-1/4 shrink-0 border-b md:border-b-0 md:border-r border-slate/10 pb-3 md:pb-0 md:pr-4">
                   <div className="flex items-center gap-1.5 text-xs text-slate font-medium">
                     <TiCalendar className="text-primary w-4 h-4" />
-                    <span>{rec.appointment_date}</span>
+                    <span>{new Date(rec.created_at).toLocaleDateString()}</span>
                   </div>
                   <div className="flex items-center gap-1.5 text-xs font-semibold text-text-base">
                     <TiUser className="text-emerald-500 w-4 h-4" />
-                    <span>{doc ? `Dr. ${doc.first_name} ${doc.last_name}` : `Staff #${rec.doctor_id}`}</span>
+                    <span>{rec.doctorName || `Staff #${rec.doctor_id}`}</span>
                   </div>
                 </div>
 
@@ -77,7 +70,7 @@ export default function MedicalHistoryPage() {
                       <TiHeartOutline className="text-red-500 w-3.5 h-3.5" /> {t("Clinical Diagnosis")}
                     </h3>
                     <p className="text-xs font-semibold mt-0.5 text-text-base bg-red-500/5 px-2.5 py-1.5 rounded-lg border border-red-500/10">
-                      {rec.medical_record.diagnosis}
+                      {rec.diagnosis}
                     </p>
                   </div>
 
@@ -86,7 +79,7 @@ export default function MedicalHistoryPage() {
                       <TiDocumentText className="text-primary w-3.5 h-3.5" /> {t("Prescribed Plan & Treatment Summary")}
                     </h3>
                     <p className="text-xs text-slate mt-1 leading-relaxed pl-1">
-                      {rec.medical_record.treatment}
+                      {rec.treatment}
                     </p>
                   </div>
                 </div>

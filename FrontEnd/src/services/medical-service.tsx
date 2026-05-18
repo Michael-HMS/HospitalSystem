@@ -114,8 +114,8 @@ export class MedicalRecordsService {
     }
 
     static async getMedicalRecordsByPatient(patientId: number): Promise<IMedicalRecord[]> {
-        const doctorId = Number(AuthService.getId());
-        return MedicalRecordsService.getMedicalHistoryByPatient(doctorId, patientId);
+        const data: BackendMedicalRecord[] = await api.get(`/patients/${patientId}/medical-records`);
+        return (data || []).map(mapMedicalRecord);
     }
 
     static async getMedicalRecordsByDoctor(_doctorId: number): Promise<IMedicalRecord[]> {

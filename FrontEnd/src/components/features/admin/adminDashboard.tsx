@@ -2,12 +2,13 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import AdminMedicationsPage from "./adminMedicationPage";
 import AdminUsersPage from "./adminUsersPage";
-import { TiDocumentText, TiGroup, TiFolder } from "react-icons/ti";
+import AdminOverviewPage from "./adminOverviewPage";
+import { TiDocumentText, TiGroup, TiFolder, TiHome } from "react-icons/ti";
 
 export default function AdminDashboard() {
   const { t, i18n } = useTranslation();
   const isRtl = i18n.language === "ar";
-  const [activeTab, setActiveTab] = useState<"medications" | "users">("medications");
+  const [activeTab, setActiveTab] = useState<"overview" | "medications" | "users">("overview");
 
   return (
     <div className="min-h-screen bg-background flex flex-col md:flex-row text-text-base" dir={isRtl ? "rtl" : "ltr"}>
@@ -22,6 +23,18 @@ export default function AdminDashboard() {
         </div>
 
         <nav className="flex flex-row md:flex-col gap-1.5 overflow-x-auto md:overflow-x-visible pb-2 md:pb-0">
+          <button
+            onClick={() => setActiveTab("overview")}
+            className={`flex items-center gap-2.5 px-3.5 py-2.5 text-sm font-medium rounded-xl whitespace-nowrap transition-all ${
+              activeTab === "overview"
+                ? "bg-primary/10 text-primary"
+                : "text-slate hover:bg-slate/5"
+            }`}
+          >
+            <TiHome className="w-4 h-4" />
+            {t("Overview")}
+          </button>
+
           <button
             onClick={() => setActiveTab("medications")}
             className={`flex items-center gap-2.5 px-3.5 py-2.5 text-sm font-medium rounded-xl whitespace-nowrap transition-all ${
@@ -50,7 +63,9 @@ export default function AdminDashboard() {
 
       {/* Main Viewport Workspace */}
       <main className="flex-1 p-4 md:p-8 overflow-x-hidden">
-        {activeTab === "medications" ? <AdminMedicationsPage /> : <AdminUsersPage />}
+        {activeTab === "overview" && <AdminOverviewPage />}
+        {activeTab === "medications" && <AdminMedicationsPage />}
+        {activeTab === "users" && <AdminUsersPage />}
       </main>
     </div>
   );

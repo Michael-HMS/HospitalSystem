@@ -14,8 +14,8 @@ export default function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
     }
 
     if (allowedRoles && !allowedRoles.includes(role)) {
-        // Logged in but insufficient role, redirect to home
-        return <Navigate to="/home" replace />;
+        // Logged in but insufficient role, redirect to forbidden
+        return <Navigate to="/403" replace />;
     }
 
     return <Outlet />;

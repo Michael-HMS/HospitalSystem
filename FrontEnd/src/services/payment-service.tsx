@@ -1,27 +1,39 @@
 import type { IPayment, IBill } from "../interfaces/IPayment";
 
-// Bills and Payments are not yet exposed by the backend API.
-// This service returns empty data until /api/bills and /api/payments endpoints are added.
+import { api } from "../lib/api";
+import { AuthService } from "./auth-service";
 
 export class BillsService {
     static async getAllBills(): Promise<IBill[]> {
-        return [];
+        const patientId = AuthService.getProfileId();
+        if (!patientId) throw new Error("No patient ID found");
+        
+        const data = await api.get(`/patients/${patientId}/bills`);
+        
+        // Map backend response to IBill format
+        return data.map((bill: any) => ({
+            invoice_id: `INV-${bill.billId}`,
+            amount: bill.totalAmount,
+            status: bill.status?.toLowerCase() === "paid" ? "paid" : "unpaid",
+            date: bill.issuedDate,
+            doctor_id: "Hospital", // Backend doesn't have doctor info on bills currently
+            description: `Hospital Bill #${bill.billId}`
+        }));
     }
 
     static async getBillById(_id: number): Promise<IBill> {
-        throw new Error("Bills endpoint not yet available");
+        throw new Error("Endpoint not available");
     }
 
     static async createBill(_bill: Partial<IBill>): Promise<IBill> {
-        throw new Error("Bills endpoint not yet available");
+        throw new Error("Endpoint not available");
     }
 
     static async updateBill(_bill: Partial<IBill>): Promise<IBill> {
-        throw new Error("Bills endpoint not yet available");
+        throw new Error("Endpoint not available");
     }
 
     static async deleteBill(_bill_id: number): Promise<void> {
-        // No endpoint
     }
 }
 
