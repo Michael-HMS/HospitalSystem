@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { DoctorsService } from "../../../../services/users-service";
+import { AuthService } from "../../../../services/auth-service";
 import Button from "../../../ui/button";
 import { TiCalendar, TiTime, TiUser, TiNotes, TiChevronRight } from "react-icons/ti";
 
@@ -19,7 +20,7 @@ export default function BookAppointmentPage() {
   const [time, setTime] = useState("");
   const [reason, setReason] = useState("");
 
-  const loggedInPatientId = 1; // Connected to auth context ID
+  const loggedInPatientId = Number(AuthService.getId()) || 0;
 
   useEffect(() => {
     const fetchDoctors = async () => {

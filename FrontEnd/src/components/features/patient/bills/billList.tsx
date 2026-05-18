@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { AppointmentsService } from "../../../../services/appointment-service";
 import { DoctorsService } from "../../../../services/users-service";
+import { AuthService } from "../../../../services/auth-service";
 import Button from "../../../ui/button";
 import { TiCreditCard } from "react-icons/ti";
 
@@ -13,7 +14,7 @@ export default function BillingPage() {
   const [doctors, setDoctors] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const loggedInPatientId = 1;
+  const loggedInPatientId = Number(AuthService.getId()) || 0;
   const standardConsultationFee = 50.00; // Flat base fee mapping fallback
 
   useEffect(() => {

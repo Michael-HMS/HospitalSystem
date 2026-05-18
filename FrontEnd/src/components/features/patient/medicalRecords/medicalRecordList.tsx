@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { AppointmentsService } from "../../../../services/appointment-service";
 import { DoctorsService } from "../../../../services/users-service";
+import { AuthService } from "../../../../services/auth-service";
 import { TiHeartOutline, TiDocumentText, TiCalendar, TiUser } from "react-icons/ti";
 
 export default function MedicalHistoryPage() {
@@ -12,7 +13,7 @@ export default function MedicalHistoryPage() {
   const [doctors, setDoctors] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const loggedInPatientId = 1;
+  const loggedInPatientId = Number(AuthService.getId()) || 0;
 
   useEffect(() => {
     const loadHistory = async () => {
