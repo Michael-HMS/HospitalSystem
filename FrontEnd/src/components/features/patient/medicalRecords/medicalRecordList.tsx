@@ -9,10 +9,7 @@ export default function MedicalHistoryPage() {
   const isRtl = i18n.language === "ar";
 
   const [records, setRecords] = useState<any[]>([]);
-  const [doctors, setDoctors] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const loggedInPatientId = 1;
 
   useEffect(() => {
     const loadHistory = async () => {

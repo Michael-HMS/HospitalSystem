@@ -9,11 +9,7 @@ export default function BillingPage() {
   const isRtl = i18n.language === "ar";
 
   const [invoices, setInvoices] = useState<any[]>([]);
-  const [doctors, setDoctors] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const loggedInPatientId = 1;
-  const standardConsultationFee = 50.00; // Flat base fee mapping fallback
 
   useEffect(() => {
     const loadBillingData = async () => {
@@ -62,7 +58,6 @@ export default function BillingPage() {
             </thead>
             <tbody className="divide-y divide-slate/10">
               {invoices.map((inv) => {
-                const doc = doctors.find((d) => Number(d.doctor_id) === Number(inv.doctor_id));
                 const isPaid = inv.status === "paid";
 
                 return (

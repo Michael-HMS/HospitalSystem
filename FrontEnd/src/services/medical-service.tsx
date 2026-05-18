@@ -1,6 +1,5 @@
 import type { IMedicalRecord, IMedication, IPrescription } from "../interfaces/IAppointment";
 import { api } from "../lib/api";
-import { AuthService } from "./auth-service";
 
 // ── Backend response shapes ───────────────────────────────────────────────────
 

@@ -213,17 +213,17 @@ public class PatientService {
         return bills.stream().map(b -> BillResponse.builder()
                 .billId(b.getBillId())
                 .patientId(b.getPatient().getPatientId())
-                .totalAmount(b.getTotalAmount())
-                .paidAmount(b.getPaidAmount())
-                .status(b.getStatus())
-                .issuedDate(b.getIssuedDate())
-                .dueDate(b.getDueDate())
+                .totalAmount(b.getTotalAmount() != null ? b.getTotalAmount().doubleValue() : 0.0)
+                .paidAmount(b.getPayments() != null ? b.getPayments().stream().mapToDouble(p -> p.getAmount() != null ? p.getAmount().doubleValue() : 0.0).sum() : 0.0)
+                .status(b.getBillStatus())
+                .issuedDate(b.getCreatedAt() != null ? b.getCreatedAt().toLocalDate() : null)
+                .dueDate(b.getCreatedAt() != null ? b.getCreatedAt().toLocalDate().plusDays(30) : null)
                 .build()
         ).collect(Collectors.toList());
     }
 
     public List<MedicalRecordResponse> getPatientMedicalRecords(Integer patientId) {
-        List<MedicalRecord> records = medicalRecordRepository.findByPatient_PatientId(patientId);
+        List<MedicalRecord> records = medicalRecordRepository.findByPatient_PatientIdOrderByCreatedAtDesc(patientId);
         return records.stream().map(r -> MedicalRecordResponse.builder()
                 .recordId(r.getRecordId())
                 .patientId(r.getPatient().getPatientId())
