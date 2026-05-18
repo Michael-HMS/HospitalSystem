@@ -14,6 +14,9 @@ import PatientsList from "../components/features/doctor/patients/patientsList";
 import PrescriptionWritingPage from "../components/features/doctor/prescription/prescriptionWriting";
 import DoctorAppointmentsPage from "../components/features/appointments/appointment/doctorAppointments";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
+import ProfilePage from "../components/profile/profilepage";
+import BillingPage from "../components/features/patient/bills/billList";
+import MedicalHistoryPage from "../components/features/patient/medicalRecords/medicalRecordList";
 
 export default function AppRoutes() {
     return (
@@ -28,12 +31,15 @@ export default function AppRoutes() {
             {/* Authenticated Routes (Any logged-in user) */}
             <Route element={<ProtectedRoute />}>
                 <Route path="/home" element={<Home />} />
+                <Route path="/profile" element={<ProfilePage />} />
             </Route>
 
             {/* Patient Only Routes */}
             <Route element={<ProtectedRoute allowedRoles={["patient"]} />}>
                 <Route path="/book-appointment" element={<BookAppointmentPage />} />
                 <Route path="/appointments" element={<AppointmentsPage />} />
+                <Route path="/bills" element={<BillingPage />} />
+                <Route path="/medical-records" element={<MedicalHistoryPage />} />
             </Route>
 
             {/* Doctor Only Routes */}

@@ -27,7 +27,7 @@ public class DepartmentController {
      */
     @GetMapping
     public ResponseEntity<List<Map<String, Object>>> getAllDepartments() {
-        List<Department> departments = departmentRepository.findAll();
+        List<Department> departments = departmentRepository.findAllWithDoctorsAndUsers();
 
         List<Map<String, Object>> result = departments.stream().map(dept -> {
             List<Map<String, Object>> doctorList = dept.getDoctors().stream().map(doc -> {
@@ -58,7 +58,7 @@ public class DepartmentController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<?> getDepartmentById(@PathVariable Integer id) {
-        return departmentRepository.findById(id)
+        return departmentRepository.findByIdWithDoctorsAndUsers(id)
                 .map(dept -> {
                     List<Map<String, Object>> doctorList = dept.getDoctors().stream().map(doc -> {
                         Map<String, Object> docMap = new java.util.HashMap<>();
