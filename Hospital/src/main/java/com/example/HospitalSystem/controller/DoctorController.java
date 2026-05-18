@@ -3,7 +3,7 @@ package com.example.HospitalSystem.controller;
 import com.example.HospitalSystem.dto.AppointmentResponse;
 import com.example.HospitalSystem.dto.DoctorDashboardResponse;
 import com.example.HospitalSystem.dto.DoctorRegisterRequest;
-import com.example.HospitalSystem.dto.DoctorResponse;
+import com.example.HospitalSystem.dto.DoctorDto;
 import com.example.HospitalSystem.dto.MedicalRecordRequest;
 import com.example.HospitalSystem.dto.MedicalRecordResponse;
 import com.example.HospitalSystem.dto.PatientProfileResponse;
@@ -61,21 +61,21 @@ public class DoctorController {
 
     // Promote a registered User to a Doctor Profile
     @PostMapping("/onboard")
-    public ResponseEntity<DoctorResponse> onboardDoctor(@RequestBody DoctorRegisterRequest request) {
+    public ResponseEntity<DoctorDto> onboardDoctor(@RequestBody DoctorRegisterRequest request) {
         return ResponseEntity.ok(doctorService.onboardDoctor(request));
     }
 
     // Search for a doctor (Patient uses this)
     @GetMapping("/search")
-    public ResponseEntity<List<DoctorResponse>> searchDoctors(
+    public ResponseEntity<List<DoctorDto>> searchDoctors(
             @RequestParam(value = "keyword", required = false) String keyword) {
-        List<DoctorResponse> result = doctorService.searchDoctors(keyword);
+        List<DoctorDto> result = doctorService.searchDoctors(keyword);
         return ResponseEntity.ok(result);
     }
 
     // Get all doctors
     @GetMapping
-    public ResponseEntity<List<DoctorResponse>> getAllDoctors() {
+    public ResponseEntity<List<DoctorDto>> getAllDoctors() {
         return ResponseEntity.ok(doctorService.getAllDoctors());
     }
 

@@ -1,122 +1,67 @@
-import type { IPayment , IBill} from "../interfaces/IPayment";
-
-
-
-
-const paymentsArray: IPayment[] = [
-    {
-        payment_id: 1,
-        bill_id: 1,
-        amount: 50,
-        payment_method: "cash",
-        transaction_reference: "ref1",
-        payment_status: "paid",
-        payment_date: "2022-01-01"
-    }
-];
-
-const billsArray: IBill[] = [
-    {
-        bill_id: 1,
-        appointment_id: 1,
-        patient_id: 1,
-        subtotal: 100,
-        tax: 0,
-        total_amount: 100,
-        bill_status: "paid",
-        created_at: "2022-01-01",
-        payments:paymentsArray
-    }
-];
+import type { IPayment, IBill } from "../interfaces/IPayment";
+// import { api } from "../lib/api";
+import { mockBills, mockPayments } from "../lib/mockData";
 
 export class BillsService {
     static async getAllBills(): Promise<IBill[]> {
-        return billsArray;
+        return mockBills;
+        // return await api.get("/bills");
     }
+
     static async getBillById(id: number): Promise<IBill> {
-        return billsArray.find((bill) => bill.bill_id === id)!;
+        return mockBills.find(b => b.bill_id === id)!;
+        // return await api.get(`/bills/${id}`);
     }
-    static async createBill(bill: IBill): Promise<IBill> {
-        billsArray.push(bill);
-        return bill;
+
+    static async createBill(bill: Partial<IBill>): Promise<IBill> {
+        const newBill = { ...bill, bill_id: Date.now() } as IBill;
+        mockBills.push(newBill);
+        return newBill;
+        // return await api.post("/bills", bill);
     }
-    static async updateBill(bill: IBill): Promise<IBill> {
-        const index = billsArray.findIndex((bill) => bill.bill_id === bill.bill_id);
-        billsArray[index] = bill;
-        return bill;
+
+    static async updateBill(bill: Partial<IBill>): Promise<IBill> {
+        const index = mockBills.findIndex(b => b.bill_id === bill.bill_id);
+        if (index !== -1) mockBills[index] = { ...mockBills[index], ...bill } as IBill;
+        return mockBills[index];
+        // return await api.put(`/bills/${bill.bill_id}`, bill);
     }
+
     static async deleteBill(bill_id: number): Promise<void> {
-        const index = billsArray.findIndex((bill) => bill.bill_id === bill_id);
-        billsArray.splice(index, 1);
+        const index = mockBills.findIndex(b => b.bill_id === bill_id);
+        if (index !== -1) mockBills.splice(index, 1);
+        // return await api.delete(`/bills/${bill_id}`);
     }
-    // static async getAllBills(): Promise<IBill[]> {
-    //     const response = await api.get("/bills");
-    //     return response.data;
-    // }
-
-    // static async getBillById(id: number): Promise<IBill> {
-    //     const response = await api.get(`/bills/${id}`);
-    //     return response.data;
-    // }
-
-    // static async createBill(bill: IBill): Promise<IBill> {
-    //     const response = await api.post("/bills", bill);
-    //     return response.data;
-    // }
-
-    // static async updateBill(bill: IBill): Promise<IBill> {
-    //     const response = await api.put(`/bills/${bill.bill_id}`, bill);
-    //     return response.data;
-    // }
-
-    // static async deleteBill(bill_id: number): Promise<void> {
-    //     const response = await api.delete(`/bills/${bill_id}`);
-    //     return response.data;
-    // }
 }
 
 export class PaymentsService {
     static async getAllPayments(): Promise<IPayment[]> {
-        return paymentsArray;
+        return mockPayments;
+        // return await api.get("/payments");
     }
+
     static async getPaymentById(id: number): Promise<IPayment> {
-        return paymentsArray.find((payment) => payment.payment_id === id)!;
+        return mockPayments.find(p => p.payment_id === id)!;
+        // return await api.get(`/payments/${id}`);
     }
-    static async createPayment(payment: IPayment): Promise<IPayment> {
-        paymentsArray.push(payment);
-        return payment;
+
+    static async createPayment(payment: Partial<IPayment>): Promise<IPayment> {
+        const newPayment = { ...payment, payment_id: Date.now() } as IPayment;
+        mockPayments.push(newPayment);
+        return newPayment;
+        // return await api.post("/payments", payment);
     }
-    static async updatePayment(payment: IPayment): Promise<IPayment> {
-        const index = paymentsArray.findIndex((payment) => payment.payment_id === payment.payment_id);
-        paymentsArray[index] = payment;
-        return payment;
+
+    static async updatePayment(payment: Partial<IPayment>): Promise<IPayment> {
+        const index = mockPayments.findIndex(p => p.payment_id === payment.payment_id);
+        if (index !== -1) mockPayments[index] = { ...mockPayments[index], ...payment } as IPayment;
+        return mockPayments[index];
+        // return await api.put(`/payments/${payment.payment_id}`, payment);
     }
+
     static async deletePayment(payment_id: number): Promise<void> {
-        const index = paymentsArray.findIndex((payment) => payment.payment_id === payment_id);
-        paymentsArray.splice(index, 1);
+        const index = mockPayments.findIndex(p => p.payment_id === payment_id);
+        if (index !== -1) mockPayments.splice(index, 1);
+        // return await api.delete(`/payments/${payment_id}`);
     }
-    // static async getAllPayments(): Promise<IPayment[]> {
-    //     const response = await api.get("/payments");
-    //     return response.data;
-    // }
-
-    // static async getPaymentById(id: number): Promise<IPayment> {
-    //     const response = await api.get(`/payments/${id}`);
-    //     return response.data;
-    // }
-
-    // static async createPayment(payment: IPayment): Promise<IPayment> {
-    //     const response = await api.post("/payments", payment);
-    //     return response.data;
-    // }
-
-    // static async updatePayment(payment: IPayment): Promise<IPayment> {
-    //     const response = await api.put(`/payments/${payment.payment_id}`, payment);
-    //     return response.data;
-    // }
-
-    // static async deletePayment(payment_id: number): Promise<void> {
-    //     const response = await api.delete(`/payments/${payment_id}`);
-    //     return response.data;
-    // }
 }
