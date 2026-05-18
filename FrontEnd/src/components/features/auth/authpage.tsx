@@ -9,7 +9,8 @@ interface LoginData {
 }
 
 interface RegisterData {
-  name: string
+  firstname: string
+  lastname: string
   email: string
   password: string
   gender: string
@@ -56,10 +57,10 @@ const AuthPage: React.FC = () => {
 
   // ── Register state ──
   const [registerData, setRegisterData] = useState<RegisterData>({
-    name: "", email: "", password: "", gender: "", phone: "", countryCode: "+20",
+    firstname: "", lastname:"" ,email: "", password: "", gender: "", phone: "", countryCode: "+20",
   })
   const [registerErrors, setRegisterErrors] = useState({
-    name: "", email: "", password: "", gender: "", phone: "",
+    firstname: "", lastname: "" ,email: "", password: "", gender: "", phone: "",
   })
 
   // ── Forgot password state ──
@@ -127,15 +128,23 @@ const AuthPage: React.FC = () => {
   }
 
   const validateRegister = () => {
-    const errs = { name: "", email: "", password: "", gender: "", phone: "" }
+    const errs = { firstname: "", lastname: "" ,email: "", password: "", gender: "", phone: "" }
     let valid = true
 
-    if (!registerData.name) {
-      errs.name = "Full name is required"; valid = false
-    } else if (!/^[A-Za-z\s]+$/.test(registerData.name)) {
-      errs.name = "Name must contain letters only"; valid = false
-    } else if (registerData.name.length < 3) {
-      errs.name = "Enter your name correctly"; valid = false
+    if (!registerData.firstname) {
+      errs.firstname = "first name is required"; valid = false
+    } else if (!/^[A-Za-z\s]+$/.test(registerData.firstname)) {
+      errs.firstname = "Name must contain letters only"; valid = false
+    } else if (registerData.firstname.length < 3) {
+      errs.firstname = "Enter your name correctly"; valid = false
+    }
+
+    if (!registerData.lastname) {
+      errs.lastname = "Last name is required"; valid = false
+    } else if (!/^[A-Za-z\s]+$/.test(registerData.lastname)) {
+      errs.lastname = "Last name must contain letters only"; valid = false
+    } else if (registerData.lastname.length < 3) {
+      errs.lastname = "Enter your last name correctly"; valid = false
     }
 
     const emailErr = validateEmail(registerData.email)
@@ -388,17 +397,30 @@ const AuthPage: React.FC = () => {
                     <p className="text-gray-400 text-sm mt-1">Join us today — it's free</p>
                   </div>
 
-                  {/* Name */}
+                  {/* First Name */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-gray-600 text-sm font-medium">Full Name</label>
+                    <label className="text-gray-600 text-sm font-medium">First Name</label>
                     <div className="relative">
                       <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">👤</span>
-                      <input type="text" placeholder="Enter your full name" value={registerData.name}
-                        onChange={(e) => { setRegisterData({ ...registerData, name: e.target.value }); setRegisterErrors({ ...registerErrors, name: "" }) }}
-                        className={`w-full border rounded-2xl pl-11 pr-4 py-3 text-sm outline-none transition-all bg-gray-50 ${registerErrors.name ? "border-red-400 focus:ring-2 focus:ring-red-100" : "border-gray-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"}`}
+                      <input type="text" placeholder="Enter your first name" value={registerData.firstname}
+                        onChange={(e) => { setRegisterData({ ...registerData, firstname: e.target.value }); setRegisterErrors({ ...registerErrors, firstname: "" }) }}
+                        className={`w-full border rounded-2xl pl-11 pr-4 py-3 text-sm outline-none transition-all bg-gray-50 ${registerErrors.firstname ? "border-red-400 focus:ring-2 focus:ring-red-100" : "border-gray-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"}`}
                       />
                     </div>
-                    {registerErrors.name && <p className="text-red-500 text-xs mt-0.5">⚠ {registerErrors.name}</p>}
+                    {registerErrors.firstname && <p className="text-red-500 text-xs mt-0.5">⚠ {registerErrors.firstname}</p>}
+                  </div>
+
+                  {/* Last Name */}
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-gray-600 text-sm font-medium">Last Name</label>
+                    <div className="relative">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">👴</span>
+                      <input type="text" placeholder="Enter your last name" value={registerData.lastname}
+                        onChange={(e) => { setRegisterData({ ...registerData, lastname: e.target.value }); setRegisterErrors({ ...registerErrors, lastname: "" }) }}
+                        className={`w-full border rounded-2xl pl-11 pr-4 py-3 text-sm outline-none transition-all bg-gray-50 ${registerErrors.lastname ? "border-red-400 focus:ring-2 focus:ring-red-100" : "border-gray-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"}`}
+                      />
+                    </div>
+                    {registerErrors.lastname && <p className="text-red-500 text-xs mt-0.5">⚠ {registerErrors.lastname}</p>}
                   </div>
 
                   {/* Email */}
