@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { TiCheck, TiHome, TiShield, TiStar, TiArrowRight } from "react-icons/ti";
+import { TiHome, TiShield, TiStar, TiArrowRight } from "react-icons/ti";
 import Button from "../../ui/button";
 
 export default function Home() {
@@ -36,7 +36,7 @@ export default function Home() {
                 <section className="grid gap-6 lg:grid-cols-[1.3fr_0.9fr] lg:items-center">
                     <div className="space-y-6 rounded-[2rem] border border-white/70 bg-white/80 p-8 shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur-xl md:p-10">
                         <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700">
-                            <TiCheck className="w-5 h-5" />
+                            <TiStar className="w-5 h-5" />
                             {registered ? "Registration successful" : "Account ready"}
                         </div>
 
