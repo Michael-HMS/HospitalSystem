@@ -17,6 +17,7 @@ interface BackendDoctorDto {
     doctorId: number;
     user: BackendUserDto;
     specialization: string;
+    departmentId: number;
     departmentName: string;
     yearsOfExperience: number;
     availabilityStatus: string;
@@ -50,7 +51,7 @@ function mapDoctor(d: BackendDoctorDto): IDoctor {
         gender: d.user?.gender ?? "",
         date_of_birth: "",
         address: "",
-        department_id: 0,
+        department_id: d.departmentId ?? 0,
         specialization: d.specialization ?? "",
         license_number: "",
         years_of_experience: d.yearsOfExperience ?? 0,

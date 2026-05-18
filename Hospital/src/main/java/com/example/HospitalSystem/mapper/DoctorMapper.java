@@ -15,6 +15,7 @@ import org.mapstruct.ReportingPolicy;
 )
 public interface DoctorMapper {
 
+    @org.mapstruct.Mapping(source = "department.departmentId", target = "departmentId")
     @org.mapstruct.Mapping(source = "department.departmentName", target = "departmentName")
     DoctorDto entityToDto(Doctor doctor);
 
