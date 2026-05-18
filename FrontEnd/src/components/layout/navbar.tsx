@@ -41,13 +41,13 @@ export default function Navbar({ role = null, onLogout }: NavbarProps) {
       name: t("Departments"),
       path: "/departments",
       icon: <TiFolderOpen className="w-4 h-4" />,
-      visible: !role
+      visible: !role || role === "patient"
     },
     {
       name: t("Doctors"),
       path: "/doctors",
       icon: <TiGroup className="w-4 h-4" />,
-      visible: !role
+      visible: !role || role === "patient"
     },
 
     // --- Patient Routes ---
@@ -72,6 +72,12 @@ export default function Navbar({ role = null, onLogout }: NavbarProps) {
     {
       name: t("Medical Records"),
       path: "/medical-records",
+      icon: <TiDocumentText className="w-4 h-4" />,
+      visible: role === "patient"
+    },
+    {
+      name: t("Record Intake"),
+      path: "/medical-record-entry",
       icon: <TiDocumentText className="w-4 h-4" />,
       visible: role === "patient"
     },
@@ -104,6 +110,18 @@ export default function Navbar({ role = null, onLogout }: NavbarProps) {
     {
       name: t("Patients List"),
       path: "/patients",
+      icon: <TiGroup className="w-4 h-4" />,
+      visible: role === "doctor"
+    },
+    {
+      name: t("Departments"),
+      path: "/departments",
+      icon: <TiFolderOpen className="w-4 h-4" />,
+      visible: role === "doctor"
+    },
+    {
+      name: t("Doctors"),
+      path: "/doctors",
       icon: <TiGroup className="w-4 h-4" />,
       visible: role === "doctor"
     },

@@ -18,6 +18,7 @@ import ProtectedRoute from "../components/auth/ProtectedRoute";
 import ProfilePage from "../components/profile/profilepage";
 import BillingPage from "../components/features/patient/bills/billList";
 import MedicalHistoryPage from "../components/features/patient/medicalRecords/medicalRecordList";
+import MedicalRecordEntryPage from "../components/features/patient/medicalRecords/medicalRecordEntry";
 
 export default function AppRoutes() {
     return (
@@ -42,6 +43,7 @@ export default function AppRoutes() {
                 <Route path="/appointments" element={<AppointmentsPage />} />
                 <Route path="/bills" element={<BillingPage />} />
                 <Route path="/medical-records" element={<MedicalHistoryPage />} />
+                <Route path="/medical-record-entry" element={<MedicalRecordEntryPage />} />
             </Route>
 
             {/* Doctor Only Routes */}
