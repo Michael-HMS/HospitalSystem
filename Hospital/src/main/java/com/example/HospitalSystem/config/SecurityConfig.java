@@ -43,7 +43,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/patients/register").permitAll()
                 .requestMatchers("/api/system/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/doctors/*/medications").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/patients/*/prescriptions").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/patients/*/prescriptions").hasRole("Patient")
                 .anyRequest().permitAll() // Keep other routes open for now
             )
 

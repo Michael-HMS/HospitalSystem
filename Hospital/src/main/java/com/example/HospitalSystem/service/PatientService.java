@@ -228,15 +228,18 @@ public class PatientService {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Patient not found: " + patientId));
 
-        if (requesterEmail != null) {
-            User user = userRepository.findByEmail(requesterEmail)
-                    .orElseThrow(() -> new ResponseStatusException(
-                            HttpStatus.UNAUTHORIZED, "User not found for token subject"));
+        if (requesterEmail == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED, "Authentication required");
+        }
 
-            if (!patient.getUser().getUserId().equals(user.getUserId())) {
-                throw new ResponseStatusException(
-                        HttpStatus.FORBIDDEN, "Access denied: prescriptions are restricted to the owning patient");
-            }
+        User user = userRepository.findByEmail(requesterEmail)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED, "User not found for token subject"));
+
+        if (!patient.getUser().getUserId().equals(user.getUserId())) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN, "Access denied: prescriptions are restricted to the owning patient");
         }
 
         return prescriptionRepository.findByPatient_PatientIdOrderByIssueDateDesc(patientId)
