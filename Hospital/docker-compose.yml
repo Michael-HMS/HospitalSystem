@@ -1,0 +1,32 @@
+# ─────────────────────────────────────────────────────────────
+# HMS API — Docker Compose (deployment)
+#
+# Uses the Aiven cloud MySQL — no local DB container needed.
+#
+# Usage:
+#   docker compose up --build -d
+#   docker compose logs -f api
+# ─────────────────────────────────────────────────────────────
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: hms-api:latest
+    container_name: hms-api
+    restart: unless-stopped
+
+    # Load secrets from .env (gitignored)
+    env_file:
+      - .env
+
+    ports:
+      - "8080:8080"
+
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/api/departments || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
