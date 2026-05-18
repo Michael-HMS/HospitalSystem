@@ -2,10 +2,11 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { DoctorsService } from "../../../../services/users-service";
+import { DepartmentsService } from "../../../../services/department-service";
 import { AppointmentsService } from "../../../../services/appointment-service";
 import { AuthService } from "../../../../services/auth-service";
 import Button from "../../../ui/button";
-import { TiCalendar, TiTime, TiUser, TiNotes, TiChevronRight } from "react-icons/ti";
+import { TiCalendar, TiTime, TiUser, TiNotes, TiChevronRight, TiHome } from "react-icons/ti";
 
 export default function BookAppointmentPage() {
   const { t, i18n } = useTranslation();
@@ -14,10 +15,12 @@ export default function BookAppointmentPage() {
   const isRtl = i18n.language === "ar";
 
   const [doctors, setDoctors] = useState<any[]>([]);
+  const [departments, setDepartments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitError, setSubmitError] = useState("");
 
   // Form States
+  const [departmentId, setDepartmentId] = useState("");
   const [doctorId, setDoctorId] = useState(searchParams.get("doctorId") || "");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
@@ -26,18 +29,36 @@ export default function BookAppointmentPage() {
   const loggedInPatientId = Number(AuthService.getId()) || 0;
 
   useEffect(() => {
-    const fetchDoctors = async () => {
+    const fetchInitialData = async () => {
       try {
-        const data = await DoctorsService.getAllDoctors();
-        setDoctors(data || []);
+        const [docsData, deptsData] = await Promise.all([
+          DoctorsService.getAllDoctors(),
+          DepartmentsService.getAllDepartments()
+        ]);
+        setDoctors(docsData || []);
+        setDepartments(deptsData || []);
+
+        // If a doctorId was passed in the URL, auto-select their department
+        if (searchParams.get("doctorId")) {
+          const docId = Number(searchParams.get("doctorId"));
+          const preselectedDoc = docsData?.find((d: any) => d.doctor_id === docId);
+          if (preselectedDoc && preselectedDoc.department_id) {
+            setDepartmentId(String(preselectedDoc.department_id));
+          }
+        }
       } catch (error) {
-        console.error("Error fetching doctors:", error);
-      } {
+        console.error("Error fetching dependencies:", error);
+      } finally {
         setLoading(false);
       }
     };
-    fetchDoctors();
-  }, []);
+    fetchInitialData();
+  }, [searchParams]);
+
+  // Filter available doctors by selected department
+  const availableDoctors = departmentId 
+    ? doctors.filter((doc) => Number(doc.department_id) === Number(departmentId) && doc.availability_status !== "on-leave")
+    : doctors.filter((doc) => doc.availability_status !== "on-leave");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,24 +92,49 @@ export default function BookAppointmentPage() {
       </header>
 
       <form onSubmit={handleSubmit} className="space-y-5 bg-background border border-slate/15 p-6 rounded-2xl shadow-sm">
-        {/* Doctor Selection */}
-        <div className="space-y-1.5">
-          <label className="text-[11px] font-bold text-slate uppercase flex items-center gap-1">
-            <TiUser className="w-4 h-4 text-primary" /> {t("Medical Specialist")}
-          </label>
-          <select
-            required
-            value={doctorId}
-            onChange={(e) => setDoctorId(e.target.value)}
-            className="w-full px-3 py-2.5 rounded-xl border border-slate/20 bg-background text-xs focus:outline-none focus:ring-2 focus:ring-primary appearance-none"
-          >
-            <option value="">{t("Choose a Doctor...")}</option>
-            {doctors.map((doc) => (
-              <option key={doc.doctor_id} value={doc.doctor_id}>
-                Dr. {doc.first_name} {doc.last_name} ({doc.specialization || t("General Practice")})
-              </option>
-            ))}
-          </select>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Department Selection */}
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-bold text-slate uppercase flex items-center gap-1">
+              <TiHome className="w-4 h-4 text-primary" /> {t("Department")}
+            </label>
+            <select
+              value={departmentId}
+              onChange={(e) => {
+                setDepartmentId(e.target.value);
+                setDoctorId(""); // Reset doctor selection when changing departments
+              }}
+              className="w-full px-3 py-2.5 rounded-xl border border-slate/20 bg-background text-xs focus:outline-none focus:ring-2 focus:ring-primary appearance-none"
+            >
+              <option value="">{t("Select Department...")}</option>
+              {departments.map((dept) => (
+                <option key={dept.department_id} value={dept.department_id}>
+                  {dept.department_name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Doctor Selection */}
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-bold text-slate uppercase flex items-center gap-1">
+              <TiUser className="w-4 h-4 text-primary" /> {t("Medical Specialist")}
+            </label>
+            <select
+              required
+              disabled={!departmentId}
+              value={doctorId}
+              onChange={(e) => setDoctorId(e.target.value)}
+              className="w-full px-3 py-2.5 rounded-xl border border-slate/20 bg-background text-xs focus:outline-none focus:ring-2 focus:ring-primary appearance-none disabled:opacity-50 disabled:bg-slate/5"
+            >
+              <option value="">{departmentId ? t("Choose an Available Doctor...") : t("Select a Department First")}</option>
+              {availableDoctors.map((doc) => (
+                <option key={doc.doctor_id} value={doc.doctor_id}>
+                  Dr. {doc.first_name} {doc.last_name} ({doc.specialization || t("General Practice")})
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {/* Date & Time Grid */}

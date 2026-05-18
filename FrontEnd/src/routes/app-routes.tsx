@@ -4,7 +4,7 @@ import Forbidden from "../components/features/notFound/403";
 import { Route, Routes } from "react-router-dom";
 import DepartmentsPage from "../components/features/hospital/departments/departmentList";
 import DoctorsPage from "../components/features/hospital/doctors/doctorsList";
-import BookAppointmentPage from "../components/features/appointments/appointment/patientAppointments";
+import BookAppointmentPage from "../components/features/patient/appointment/appointmentBook";
 import AppointmentsPage from "../components/features/appointments/appointment/patientAppointments";
 import LandingPage from "../components/features/home/landingPage"
 import AuthPage from "../components/features/auth/authpage"
