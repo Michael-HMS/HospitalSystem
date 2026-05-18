@@ -5,6 +5,7 @@ export interface LoginResponse {
     role: string;
     user: {
         id: number;
+        profileId?: number;
         firstName: string;
         lastName: string;
         email: string;
@@ -15,6 +16,7 @@ export interface RegisterResponse {
     message: string;
     user: {
         id: number;
+        profileId?: number;
         firstName: string;
         lastName: string;
         email: string;
@@ -31,7 +33,17 @@ export class AuthService {
     }
 
     static getId(): string | null {
+        // Returns the role-specific profile ID (doctor_id or patient_id)
+        // Falls back to user_id for admin
+        return localStorage.getItem("profileId") || localStorage.getItem("id");
+    }
+
+    static getUserId(): string | null {
         return localStorage.getItem("id");
+    }
+
+    static getProfileId(): string | null {
+        return localStorage.getItem("profileId");
     }
 
     static getFirstName(): string | null {
@@ -50,16 +62,17 @@ export class AuthService {
         localStorage.removeItem("token");
         localStorage.removeItem("role");
         localStorage.removeItem("id");
+        localStorage.removeItem("profileId");
         localStorage.removeItem("firstName");
         localStorage.removeItem("lastName");
         localStorage.removeItem("email");
     }
 
-    static storeSession(token: string, role: string, user: { id: number; firstName: string; lastName: string; email: string }) {
+    static storeSession(token: string, role: string, user: { id: number; profileId?: number; firstName: string; lastName: string; email: string }) {
         localStorage.setItem("token", token);
-        // Normalize role to lowercase to match ProtectedRoute allowedRoles
         localStorage.setItem("role", role.toLowerCase());
         localStorage.setItem("id", String(user.id));
+        localStorage.setItem("profileId", String(user.profileId ?? user.id));
         localStorage.setItem("firstName", user.firstName);
         localStorage.setItem("lastName", user.lastName);
         localStorage.setItem("email", user.email);
