@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { AppointmentsService } from "../../../../services/appointment-service";
 import { DoctorsService } from "../../../../services/users-service"; 
-import { AuthService } from "../../../../services/auth-service";
 import DetailModal from "../../../ui/modal";
 import Button from "../../../ui/button";
 import { 
@@ -45,9 +44,6 @@ export default function PatientAppointmentsPage() {
   const [doctors, setDoctors] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedAppointment, setSelectedAppointment] = useState<ILocalAppointment | null>(null);
-
-  // Replace this placeholder integer with your global Auth Context/Session ID variable directly if needed
-  const loggedInPatientId = Number(AuthService.getId()) || 0;
 
   useEffect(() => {
     const loadPatientDashboard = async () => {

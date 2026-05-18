@@ -39,3 +39,6 @@ backups
 full_backup.ps1
 backup.ps1
 /.kiro
+.gitignore
+Hospital/src/main/resources/schema.sql
+Hospital/src/main/resources/seed.sql

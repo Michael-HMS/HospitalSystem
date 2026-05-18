@@ -548,7 +548,7 @@ const AuthPage: React.FC = () => {
                       setApiError("")
                       setIsSubmitting(true)
                       try {
-                        await AuthService.register(registerData.name, registerData.email, registerData.password)
+                        await AuthService.register(registerData.firstname, registerData.email, registerData.password)
                         // Auto-login after successful registration
                         const res = await AuthService.login(registerData.email, registerData.password)
                         AuthService.storeSession(res.token, res.role, res.user)
