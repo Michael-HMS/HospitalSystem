@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:Hospital/src/main/java/com/example/HospitalSystem/entity/Notification.java
 package com.example.HospitalSystem.entity;
-========
-package com.example.hospitalsystem.entity;
->>>>>>>> origin/FrontEnd:src/main/java/com/example/hospitalsystem/entity/Notification.java
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -1,12 +1,7 @@
-<<<<<<<< HEAD:Hospital/src/main/java/com/example/HospitalSystem/entity/Doctor.java
 package com.example.HospitalSystem.entity;
 
-import com.example.HospitalSystem.entity.enums.AvailabilityStatus;
-========
-package com.example.hospitalsystem.entity;
 
-import com.example.hospitalsystem.entity.enums.AvailabilityStatus;
->>>>>>>> origin/FrontEnd:src/main/java/com/example/hospitalsystem/entity/Doctor.java
+import com.example.HospitalSystem.entity.enums.AvailabilityStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

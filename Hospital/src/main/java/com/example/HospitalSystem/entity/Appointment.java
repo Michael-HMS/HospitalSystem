@@ -1,12 +1,6 @@
-<<<<<<<< HEAD:Hospital/src/main/java/com/example/HospitalSystem/entity/Appointment.java
 package com.example.HospitalSystem.entity;
 
 import com.example.HospitalSystem.entity.enums.AppointmentStatus;
-========
-package com.example.hospitalsystem.entity;
-
-import com.example.hospitalsystem.entity.enums.AppointmentStatus;
->>>>>>>> origin/FrontEnd:src/main/java/com/example/hospitalsystem/entity/Appointment.java
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:Hospital/src/main/java/com/example/HospitalSystem/entity/Prescription.java
 package com.example.HospitalSystem.entity;
-========
-package com.example.hospitalsystem.entity;
->>>>>>>> origin/FrontEnd:src/main/java/com/example/hospitalsystem/entity/Prescription.java
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
