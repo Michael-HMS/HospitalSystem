@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { TiHome, TiShield, TiStar, TiArrowRight } from "react-icons/ti";
+import { TiHome, TiLockClosed, TiStar, TiArrowRight } from "react-icons/ti";
 import Button from "../../ui/button";
 
 export default function Home() {
@@ -80,7 +80,7 @@ export default function Home() {
                             <div className="mb-6 flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15">
-                                        <TiShield className="h-6 w-6" />
+                                        <TiLockClosed className="h-6 w-6" />
                                     </div>
                                     <div>
                                         <p className="text-sm/5 font-semibold uppercase tracking-[0.2em] text-white/80">Ready</p>
