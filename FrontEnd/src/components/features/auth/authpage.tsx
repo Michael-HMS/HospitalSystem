@@ -376,7 +376,7 @@ const AuthPage: React.FC = () => {
                       try {
                         const res = await AuthService.login(loginData.email, loginData.password)
                         AuthService.storeSession(res.token, res.role, res.user)
-                        navigate("/home")
+                        navigate("/home", { state: { registered: true } })
                       } catch (err) {
                         if (err instanceof ApiError) {
                           setApiError(err.message)
