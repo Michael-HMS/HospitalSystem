@@ -161,7 +161,6 @@ export default function DoctorsPage() {
       {selectedDoctor && (
         <DetailModal
           isOpen={!!selectedDoctor}
-          onClose={() => setSelectedDoctor(null)}
           {...mapDoctorToModalProps(
             selectedDoctor, 
             () => setSelectedDoctor(null),

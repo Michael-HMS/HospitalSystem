@@ -1,0 +1,16 @@
+# Maven build output — rebuilt inside the container
+target/
+
+# Local developer config — never baked into the image
+src/main/resources/application-local.properties
+src/main/resources/application-local.properties.example
+
+# Git / IDE noise
+.git/
+.gitignore
+.idea/
+*.iml
+
+# Temp files
+*.log
+*.tmp

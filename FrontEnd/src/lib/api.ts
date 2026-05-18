@@ -1,8 +1,8 @@
 import { AuthService } from "../services/auth-service";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 
-class ApiError extends Error {
+export class ApiError extends Error {
     status: number;
 
     constructor(status: number, message: string) {
@@ -14,7 +14,7 @@ class ApiError extends Error {
 
 async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
     const token = AuthService.getToken();
-    
+
     const headers: Record<string, string> = {
         "Content-Type": "application/json",
         ...(options.headers as Record<string, string>)
@@ -33,17 +33,16 @@ async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
         let errorMessage = "An error occurred during the request.";
         try {
             const errorData = await response.json();
-            errorMessage = errorData.message || errorMessage;
+            errorMessage = errorData.error || errorData.message || errorMessage;
         } catch {
             // Ignored, fallback to default message
         }
-        
+
         if (response.status === 401 || response.status === 403) {
-            // Optionally handle token expiration / forced logout here
-            // AuthService.logout();
-            // window.location.href = "/auth";
+            AuthService.logout();
+            window.location.href = "/auth";
         }
-        
+
         throw new ApiError(response.status, errorMessage);
     }
 
@@ -57,7 +56,11 @@ async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
 
 export const api = {
     get: (endpoint: string) => fetchWithAuth(endpoint, { method: "GET" }),
-    post: (endpoint: string, body: any) => fetchWithAuth(endpoint, { method: "POST", body: JSON.stringify(body) }),
-    put: (endpoint: string, body: any) => fetchWithAuth(endpoint, { method: "PUT", body: JSON.stringify(body) }),
+    post: (endpoint: string, body: unknown) =>
+        fetchWithAuth(endpoint, { method: "POST", body: JSON.stringify(body) }),
+    put: (endpoint: string, body: unknown) =>
+        fetchWithAuth(endpoint, { method: "PUT", body: JSON.stringify(body) }),
+    patch: (endpoint: string, body?: unknown) =>
+        fetchWithAuth(endpoint, { method: "PATCH", body: body ? JSON.stringify(body) : undefined }),
     delete: (endpoint: string) => fetchWithAuth(endpoint, { method: "DELETE" })
 };

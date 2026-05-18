@@ -1,9 +1,10 @@
 import Home from "../components/features/home/home";
 import NotFound from "../components/features/notFound/404";
+import Forbidden from "../components/features/notFound/403";
 import { Route, Routes } from "react-router-dom";
 import DepartmentsPage from "../components/features/hospital/departments/departmentList";
 import DoctorsPage from "../components/features/hospital/doctors/doctorsList";
-import BookAppointmentPage from "../components/features/appointments/appointment/patientAppointments";
+import BookAppointmentPage from "../components/features/patient/appointment/appointmentBook";
 import AppointmentsPage from "../components/features/appointments/appointment/patientAppointments";
 import LandingPage from "../components/features/home/landingPage"
 import AuthPage from "../components/features/auth/authpage"
@@ -14,6 +15,9 @@ import PatientsList from "../components/features/doctor/patients/patientsList";
 import PrescriptionWritingPage from "../components/features/doctor/prescription/prescriptionWriting";
 import DoctorAppointmentsPage from "../components/features/appointments/appointment/doctorAppointments";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
+import ProfilePage from "../components/profile/profilepage";
+import BillingPage from "../components/features/patient/bills/billList";
+import MedicalHistoryPage from "../components/features/patient/medicalRecords/medicalRecordList";
 
 export default function AppRoutes() {
     return (
@@ -23,17 +27,21 @@ export default function AppRoutes() {
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/departments" element={<DepartmentsPage />} />
             <Route path="/doctors" element={<DoctorsPage />} />
+            <Route path="/403" element={<Forbidden />} />
             <Route path="*" element={<NotFound />} />
 
             {/* Authenticated Routes (Any logged-in user) */}
             <Route element={<ProtectedRoute />}>
                 <Route path="/home" element={<Home />} />
+                <Route path="/profile" element={<ProfilePage />} />
             </Route>
 
             {/* Patient Only Routes */}
             <Route element={<ProtectedRoute allowedRoles={["patient"]} />}>
                 <Route path="/book-appointment" element={<BookAppointmentPage />} />
                 <Route path="/appointments" element={<AppointmentsPage />} />
+                <Route path="/bills" element={<BillingPage />} />
+                <Route path="/medical-records" element={<MedicalHistoryPage />} />
             </Route>
 
             {/* Doctor Only Routes */}

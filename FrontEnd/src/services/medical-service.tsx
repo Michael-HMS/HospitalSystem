@@ -1,109 +1,209 @@
 import type { IMedicalRecord, IMedication, IPrescription } from "../interfaces/IAppointment";
-// import { api } from "../lib/api";
-import { mockMedicalRecords, mockPrescriptions, mockMedications } from "../lib/mockData";
+import { api } from "../lib/api";
+
+// ── Backend response shapes ───────────────────────────────────────────────────
+
+interface BackendMedication {
+    medicationId: number;
+    medicationName: string;
+    description: string;
+    stockQuantity: number;
+    expiryDate: string;
+    price: number;
+}
+
+interface BackendPrescriptionDetail {
+    detailId: number;
+    medicationId: number;
+    medicationName: string;
+    dosage: string;
+    frequency: string;
+    duration: string;
+}
+
+interface BackendPrescription {
+    prescriptionId: number;
+    medicalRecordId: number;
+    patientId: number;
+    patientName: string;
+    doctorId: number;
+    doctorName: string;
+    issueDate: string;
+    notes: string;
+    details: BackendPrescriptionDetail[];
+}
+
+interface BackendMedicalRecord {
+    recordId: number;
+    patientId: number;
+    patientName: string;
+    doctorId: number;
+    doctorName: string;
+    appointmentId: number;
+    diagnosis: string;
+    treatment: string;
+    notes: string;
+    createdAt: string;
+}
+
+// ── Mappers ───────────────────────────────────────────────────────────────────
+
+function mapMedication(m: BackendMedication): IMedication {
+    return {
+        medication_id: m.medicationId,
+        medication_name: m.medicationName ?? "",
+        description: m.description ?? "",
+        stock_quantity: m.stockQuantity ?? 0,
+        expiry_date: m.expiryDate ?? "",
+        price: Number(m.price ?? 0),
+    };
+}
+
+function mapPrescription(p: BackendPrescription): IPrescription {
+    const medications: IMedication[] = (p.details || []).map((d) => ({
+        medication_id: d.medicationId,
+        medication_name: d.medicationName ?? "",
+        description: "",
+        stock_quantity: 0,
+        expiry_date: "",
+        price: 0,
+    }));
+
+    return {
+        prescription_id: p.prescriptionId,
+        record_id: p.medicalRecordId,
+        doctor_id: p.doctorId,
+        patient_id: p.patientId,
+        issue_date: p.issueDate ?? "",
+        notes: p.notes ?? "",
+        medications,
+    };
+}
+
+function mapMedicalRecord(r: BackendMedicalRecord): IMedicalRecord {
+    return {
+        record_id: r.recordId,
+        patient_id: r.patientId,
+        doctor_id: r.doctorId,
+        appointment_id: r.appointmentId,
+        diagnosis: r.diagnosis ?? "",
+        treatment: r.treatment ?? "",
+        notes: r.notes ?? "",
+        created_at: r.createdAt ?? "",
+    };
+}
+
+// ── Services ──────────────────────────────────────────────────────────────────
 
 export class MedicalRecordsService {
+    static async getMedicalHistoryByPatient(doctorId: number, patientId: number): Promise<IMedicalRecord[]> {
+        const data: BackendMedicalRecord[] = await api.get(
+            `/doctors/${doctorId}/patients/${patientId}/medical-history`
+        );
+        return (data || []).map(mapMedicalRecord);
+    }
+
     static async getAllMedicalRecords(): Promise<IMedicalRecord[]> {
-        return mockMedicalRecords;
-        // return await api.get("/medical-records");
+        // No global list endpoint — returns empty; use role-specific methods
+        return [];
     }
 
     static async getMedicalRecordById(id: number): Promise<IMedicalRecord> {
-        return mockMedicalRecords.find(r => r.record_id === id)!;
-        // return await api.get(`/medical-records/${id}`);
+        throw new Error(`No single medical record endpoint for id ${id}`);
     }
 
-    static async getMedicalRecordsByPatient(patient_id: number): Promise<IMedicalRecord[]> {
-        return mockMedicalRecords.filter(r => r.patient_id === patient_id);
-        // return await api.get(`/medical-records/patient/${patient_id}`);
+    static async getMedicalRecordsByPatient(patientId: number): Promise<IMedicalRecord[]> {
+        const data: BackendMedicalRecord[] = await api.get(`/patients/${patientId}/medical-records`);
+        return (data || []).map(mapMedicalRecord);
     }
 
-    static async getMedicalRecordsByDoctor(doctor_id: number): Promise<IMedicalRecord[]> {
-        return mockMedicalRecords.filter(r => r.doctor_id === doctor_id);
-        // return await api.get(`/medical-records/doctor/${doctor_id}`);
+    static async getMedicalRecordsByDoctor(_doctorId: number): Promise<IMedicalRecord[]> {
+        return [];
     }
 
-    static async createMedicalRecord(medicalRecord: Partial<IMedicalRecord>): Promise<IMedicalRecord> {
-        const newRecord = { ...medicalRecord, record_id: Date.now() } as IMedicalRecord;
-        mockMedicalRecords.push(newRecord);
-        return newRecord;
-        // return await api.post("/medical-records", medicalRecord);
+    static async createMedicalRecord(
+        doctorId: number,
+        record: { patientId: number; appointmentId: number; diagnosis: string; treatment: string; notes?: string }
+    ): Promise<IMedicalRecord> {
+        const data: BackendMedicalRecord = await api.post(`/doctors/${doctorId}/medical-records`, record);
+        return mapMedicalRecord(data);
     }
 
-    static async updateMedicalRecord(medicalRecord: Partial<IMedicalRecord>): Promise<IMedicalRecord> {
-        const index = mockMedicalRecords.findIndex(r => r.record_id === medicalRecord.record_id);
-        if (index !== -1) mockMedicalRecords[index] = { ...mockMedicalRecords[index], ...medicalRecord } as IMedicalRecord;
-        return mockMedicalRecords[index];
-        // return await api.put(`/medical-records/${medicalRecord.record_id}`, medicalRecord);
+    static async updateMedicalRecord(
+        doctorId: number,
+        recordId: number,
+        record: Partial<{ patientId: number; appointmentId: number; diagnosis: string; treatment: string; notes: string }>
+    ): Promise<IMedicalRecord> {
+        const data: BackendMedicalRecord = await api.put(
+            `/doctors/${doctorId}/medical-records/${recordId}`,
+            record
+        );
+        return mapMedicalRecord(data);
     }
 
-    static async deleteMedicalRecord(record_id: number): Promise<void> {
-        const index = mockMedicalRecords.findIndex(r => r.record_id === record_id);
-        if (index !== -1) mockMedicalRecords.splice(index, 1);
-        // return await api.delete(`/medical-records/${record_id}`);
+    static async deleteMedicalRecord(_record_id: number): Promise<void> {
+        // No delete endpoint on the backend
     }
 }
 
 export class PrescriptionsService {
+    static async getPatientPrescriptions(doctorId: number, patientId: number): Promise<IPrescription[]> {
+        const data: BackendPrescription[] = await api.get(
+            `/doctors/${doctorId}/patients/${patientId}/prescriptions`
+        );
+        return (data || []).map(mapPrescription);
+    }
+
     static async getAllPrescriptions(): Promise<IPrescription[]> {
-        return mockPrescriptions;
-        // return await api.get("/prescriptions");
+        return [];
     }
 
-    static async getPrescriptionById(id: number): Promise<IPrescription> {
-        return mockPrescriptions.find(p => p.prescription_id === id)!;
-        // return await api.get(`/prescriptions/${id}`);
+    static async getPrescriptionById(_id: number): Promise<IPrescription> {
+        throw new Error("No single prescription endpoint");
     }
 
-    static async createPrescription(prescription: Partial<IPrescription>): Promise<IPrescription> {
-        const newPresc = { ...prescription, prescription_id: Date.now() } as IPrescription;
-        mockPrescriptions.push(newPresc);
-        return newPresc;
-        // return await api.post("/prescriptions", prescription);
+    static async createPrescription(
+        doctorId: number,
+        prescription: {
+            patientId: number;
+            medicalRecordId?: number;
+            notes?: string;
+            details: Array<{ medicationId: number; dosage: string; frequency: string; duration: string }>;
+        }
+    ): Promise<IPrescription> {
+        const data: BackendPrescription = await api.post(`/doctors/${doctorId}/prescriptions`, prescription);
+        return mapPrescription(data);
     }
 
-    static async updatePrescription(prescription: Partial<IPrescription>): Promise<IPrescription> {
-        const index = mockPrescriptions.findIndex(p => p.prescription_id === prescription.prescription_id);
-        if (index !== -1) mockPrescriptions[index] = { ...mockPrescriptions[index], ...prescription } as IPrescription;
-        return mockPrescriptions[index];
-        // return await api.put(`/prescriptions/${prescription.prescription_id}`, prescription);
+    static async updatePrescription(_prescription: Partial<IPrescription>): Promise<IPrescription> {
+        throw new Error("No update prescription endpoint");
     }
 
-    static async deletePrescription(prescription_id: number): Promise<void> {
-        const index = mockPrescriptions.findIndex(p => p.prescription_id === prescription_id);
-        if (index !== -1) mockPrescriptions.splice(index, 1);
-        // return await api.delete(`/prescriptions/${prescription_id}`);
+    static async deletePrescription(_prescription_id: number): Promise<void> {
+        // No delete endpoint
     }
 }
 
 export class MedicationsService {
     static async getAllMedications(): Promise<IMedication[]> {
-        return mockMedications;
-        // return await api.get("/medications");
+        const data: BackendMedication[] = await api.get("/medications");
+        return (data || []).map(mapMedication);
     }
 
     static async getMedicationById(id: number): Promise<IMedication> {
-        return mockMedications.find(m => m.medication_id === id)!;
-        // return await api.get(`/medications/${id}`);
+        const data: BackendMedication = await api.get(`/medications/${id}`);
+        return mapMedication(data);
     }
 
-    static async createMedication(medication: Partial<IMedication>): Promise<IMedication> {
-        const newMed = { ...medication, medication_id: Date.now() } as IMedication;
-        mockMedications.push(newMed);
-        return newMed;
-        // return await api.post("/medications", medication);
+    static async createMedication(_medication: Partial<IMedication>): Promise<IMedication> {
+        throw new Error("No create medication endpoint");
     }
 
-    static async updateMedication(medication: Partial<IMedication>): Promise<IMedication> {
-        const index = mockMedications.findIndex(m => m.medication_id === medication.medication_id);
-        if (index !== -1) mockMedications[index] = { ...mockMedications[index], ...medication } as IMedication;
-        return mockMedications[index];
-        // return await api.put(`/medications/${medication.medication_id}`, medication);
+    static async updateMedication(_medication: Partial<IMedication>): Promise<IMedication> {
+        throw new Error("No update medication endpoint");
     }
 
-    static async deleteMedication(medication_id: number): Promise<void> {
-        const index = mockMedications.findIndex(m => m.medication_id === medication_id);
-        if (index !== -1) mockMedications.splice(index, 1);
-        // return await api.delete(`/medications/${medication_id}`);
+    static async deleteMedication(_medication_id: number): Promise<void> {
+        // No delete endpoint
     }
 }

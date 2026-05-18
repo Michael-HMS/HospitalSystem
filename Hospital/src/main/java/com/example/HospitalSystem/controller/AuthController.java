@@ -5,6 +5,7 @@ import com.example.HospitalSystem.dto.RegisterRequest;
 import com.example.HospitalSystem.entity.Patient;
 import com.example.HospitalSystem.entity.User;
 import com.example.HospitalSystem.entity.enums.UserRole;
+import com.example.HospitalSystem.repository.DoctorRepository;
 import com.example.HospitalSystem.repository.PatientRepository;
 import com.example.HospitalSystem.repository.UserRepository;
 import com.example.HospitalSystem.util.JwtUtil;
@@ -30,6 +31,9 @@ public class AuthController {
     private PatientRepository patientRepository;
 
     @Autowired
+    private DoctorRepository doctorRepository;
+
+    @Autowired
     private JwtUtil jwtUtil;
 
     @PostMapping("/register")
@@ -37,7 +41,6 @@ public class AuthController {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            // Check if user already exists
             if (userRepository.findByEmail(request.getEmail()).isPresent()) {
                 response.put("error", "Email is already registered");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
@@ -45,7 +48,6 @@ public class AuthController {
 
             User newUser = new User();
 
-            // Handle "username" mapping to first/last name
             if (request.getUsername() != null) {
                 String[] names = request.getUsername().split(" ", 2);
                 newUser.setFirstName(names[0]);
@@ -56,22 +58,19 @@ public class AuthController {
             }
 
             newUser.setEmail(request.getEmail());
-
-            // Hash the password with jBCrypt
             String hashedPassword = BCrypt.hashpw(request.getPassword(), BCrypt.gensalt());
             newUser.setPasswordHash(hashedPassword);
             newUser.setRole(UserRole.Patient);
-
             userRepository.save(newUser);
 
-            // Create connected Patient
             Patient newPatient = new Patient();
             newPatient.setUser(newUser);
-            patientRepository.save(newPatient);
+            Patient savedPatient = patientRepository.save(newPatient);
 
             response.put("message", "User registered successfully as Patient");
             Map<String, Object> userData = new HashMap<>();
             userData.put("id", newUser.getUserId());
+            userData.put("profileId", savedPatient.getPatientId());
             userData.put("firstName", newUser.getFirstName());
             userData.put("lastName", newUser.getLastName());
             userData.put("email", newUser.getEmail());
@@ -100,23 +99,31 @@ public class AuthController {
                 User user = userOpt.get();
                 if (BCrypt.checkpw(password, user.getPasswordHash())) {
                     String roleName = user.getRole().name();
-                    // Success! Generate token
                     String token = jwtUtil.generateToken(email, roleName);
 
-                    // Add Header
                     HttpHeaders headers = new HttpHeaders();
                     headers.set("Authorization", "Bearer " + token);
 
-                    // Prepare Response Body
                     response.put("message", "Login successful");
                     response.put("role", roleName);
 
-                    // Safely map user data
                     Map<String, Object> userData = new HashMap<>();
                     userData.put("email", email);
                     userData.put("id", user.getUserId());
                     userData.put("firstName", user.getFirstName());
                     userData.put("lastName", user.getLastName());
+
+                    // Resolve the role-specific profile ID (doctor_id or patient_id)
+                    // so the frontend can call role-specific endpoints directly
+                    if (user.getRole() == UserRole.Doctor) {
+                        doctorRepository.findByUser_UserId(user.getUserId())
+                                .ifPresent(d -> userData.put("profileId", d.getDoctorId()));
+                    } else if (user.getRole() == UserRole.Patient) {
+                        patientRepository.findByUser_UserId(user.getUserId())
+                                .ifPresent(p -> userData.put("profileId", p.getPatientId()));
+                    } else {
+                        userData.put("profileId", user.getUserId());
+                    }
 
                     response.put("user", userData);
                     response.put("token", token);
@@ -125,7 +132,6 @@ public class AuthController {
                 }
             }
 
-            // Not found in any role or invalid password
             response.put("error", "Invalid email or password");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
 

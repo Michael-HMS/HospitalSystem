@@ -32,10 +32,13 @@ build/
 ### VS Code ###
 .vscode/
 .env
-src/main/resources/application-local.properties
-src/main/resources/application.properties
+Hospital/src/main/resources/application-local.properties
+Hospital/src/main/resources/application.properties
 
 backups
 full_backup.ps1
 backup.ps1
 /.kiro
+.gitignore
+Hospital/src/main/resources/schema.sql
+Hospital/src/main/resources/seed.sql

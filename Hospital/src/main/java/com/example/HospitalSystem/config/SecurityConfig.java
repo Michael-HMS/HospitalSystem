@@ -8,8 +8,12 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import com.example.HospitalSystem.util.JwtUtil;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -27,6 +31,9 @@ public class SecurityConfig {
             // Disable CSRF since we are using JWT/Stateless authentication
             .csrf(csrf -> csrf.disable())
 
+            // Enable CORS using our bean below
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
             // Stateless API: no server-side sessions
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             
@@ -42,11 +49,26 @@ public class SecurityConfig {
 
             // Add JWT authentication filter
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-            
             // Disable default login page and http basic prompts
             .formLogin(form -> form.disable())
             .httpBasic(basic -> basic.disable());
 
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+
+        // Allow the React dev server, localhost, and Vercel production frontend
+        config.setAllowedOriginPatterns(List.of("http://localhost:*", "http://127.0.0.1:*", "https://hospital-system-fawn.vercel.app"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setExposedHeaders(List.of("Authorization"));
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 }

@@ -20,6 +20,12 @@ import com.example.HospitalSystem.entity.enums.AvailabilityStatus;
 import com.example.HospitalSystem.mapper.PatientMapper;
 import com.example.HospitalSystem.repository.AppointmentRepository;
 import com.example.HospitalSystem.repository.DoctorRepository;
+import com.example.HospitalSystem.repository.BillRepository;
+import com.example.HospitalSystem.repository.MedicalRecordRepository;
+import com.example.HospitalSystem.dto.BillResponse;
+import com.example.HospitalSystem.dto.MedicalRecordResponse;
+import com.example.HospitalSystem.entity.Bill;
+import com.example.HospitalSystem.entity.MedicalRecord;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,6 +50,12 @@ public class PatientService {
 
     @Autowired
     private AppointmentRepository appointmentRepository;
+
+    @Autowired
+    private BillRepository billRepository;
+
+    @Autowired
+    private MedicalRecordRepository medicalRecordRepository;
 
     @Autowired
     private PatientMapper patientMapper;
@@ -123,6 +135,26 @@ public class PatientService {
     }
 
     /**
+     * Use case: A patient views their own appointment history.
+     * GET /api/patients/{patientId}/appointments
+     */
+    public List<AppointmentResponse> getPatientAppointments(Integer patientId) {
+        List<Appointment> appointments =
+                appointmentRepository.findByPatient_PatientIdOrderByAppointmentDateDescAppointmentTimeDesc(patientId);
+
+        return appointments.stream().map(a -> AppointmentResponse.builder()
+                .appointmentId(a.getAppointmentId())
+                .patientId(a.getPatient().getPatientId())
+                .patientName(a.getPatient().getUser().getFirstName() + " " + a.getPatient().getUser().getLastName())
+                .appointmentDate(a.getAppointmentDate())
+                .appointmentTime(a.getAppointmentTime())
+                .status(a.getStatus().name())
+                .reason(a.getReason())
+                .build()
+        ).collect(Collectors.toList());
+    }
+
+    /**
      * Use case: A patient books an appointment with a specific doctor.
      */
     @Transactional
@@ -143,9 +175,10 @@ public class PatientService {
 
         // Second, check for double-booking on that specific date and time
         // We fetch all active appointments for that day (ignoring cancelled ones)
-        List<Appointment> dailyAppointments = appointmentRepository.findActiveAppointmentsByDoctorAndDate(
+        List<Appointment> dailyAppointments = appointmentRepository.findByDoctor_DoctorIdAndAppointmentDateAndStatusNot(
                 request.getDoctorId(), 
-                request.getAppointmentDate()
+                request.getAppointmentDate(),
+                AppointmentStatus.Cancelled
         );
 
         // Check if the requested time exactly matches or overlaps closely (assuming 30 min slots)
@@ -237,5 +270,36 @@ public class PatientService {
                 .notes(prescription.getNotes())
                 .details(details)
                 .build();
+    }
+
+    public List<BillResponse> getPatientBills(Integer patientId) {
+        List<Bill> bills = billRepository.findByPatient_PatientId(patientId);
+        return bills.stream().map(b -> BillResponse.builder()
+                .billId(b.getBillId())
+                .patientId(b.getPatient().getPatientId())
+                .totalAmount(b.getTotalAmount() != null ? b.getTotalAmount().doubleValue() : 0.0)
+                .paidAmount(b.getPayments() != null ? b.getPayments().stream().mapToDouble(p -> p.getAmount() != null ? p.getAmount().doubleValue() : 0.0).sum() : 0.0)
+                .status(b.getBillStatus())
+                .issuedDate(b.getCreatedAt() != null ? b.getCreatedAt().toLocalDate() : null)
+                .dueDate(b.getCreatedAt() != null ? b.getCreatedAt().toLocalDate().plusDays(30) : null)
+                .build()
+        ).collect(Collectors.toList());
+    }
+
+    public List<MedicalRecordResponse> getPatientMedicalRecords(Integer patientId) {
+        List<MedicalRecord> records = medicalRecordRepository.findByPatient_PatientIdOrderByCreatedAtDesc(patientId);
+        return records.stream().map(r -> MedicalRecordResponse.builder()
+                .recordId(r.getRecordId())
+                .patientId(r.getPatient().getPatientId())
+                .patientName(r.getPatient().getUser().getFirstName() + " " + r.getPatient().getUser().getLastName())
+                .doctorId(r.getDoctor() != null ? r.getDoctor().getDoctorId() : null)
+                .doctorName(r.getDoctor() != null ? r.getDoctor().getUser().getFirstName() + " " + r.getDoctor().getUser().getLastName() : "Unknown")
+                .appointmentId(r.getAppointment() != null ? r.getAppointment().getAppointmentId() : null)
+                .diagnosis(r.getDiagnosis())
+                .treatment(r.getTreatment())
+                .notes(r.getNotes())
+                .createdAt(r.getCreatedAt())
+                .build()
+        ).collect(Collectors.toList());
     }
 }

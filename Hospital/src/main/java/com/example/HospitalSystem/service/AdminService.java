@@ -4,6 +4,10 @@ import com.example.HospitalSystem.dto.UserResponse;
 import com.example.HospitalSystem.dto.UserUpdateRequest;
 import com.example.HospitalSystem.entity.User;
 import com.example.HospitalSystem.repository.UserRepository;
+import com.example.HospitalSystem.repository.PatientRepository;
+import com.example.HospitalSystem.repository.DoctorRepository;
+import com.example.HospitalSystem.repository.AppointmentRepository;
+import com.example.HospitalSystem.dto.DashboardStatsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +20,15 @@ public class AdminService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PatientRepository patientRepository;
+
+    @Autowired
+    private DoctorRepository doctorRepository;
+
+    @Autowired
+    private AppointmentRepository appointmentRepository;
 
     public List<UserResponse> getAllUsers() {
         return userRepository.findAll().stream().map(this::mapToResponse).collect(Collectors.toList());
@@ -57,6 +70,14 @@ public class AdminService {
                 .email(user.getEmail())
                 .role(user.getRole())
                 .phone(user.getPhone())
+                .build();
+    }
+
+    public DashboardStatsResponse getDashboardStats() {
+        return DashboardStatsResponse.builder()
+                .totalPatients(patientRepository.count())
+                .totalDoctors(doctorRepository.count())
+                .totalAppointments(appointmentRepository.count())
                 .build();
     }
 }

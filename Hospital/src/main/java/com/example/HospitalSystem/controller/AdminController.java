@@ -2,6 +2,7 @@ package com.example.HospitalSystem.controller;
 
 import com.example.HospitalSystem.dto.UserResponse;
 import com.example.HospitalSystem.dto.UserUpdateRequest;
+import com.example.HospitalSystem.dto.DashboardStatsResponse;
 import com.example.HospitalSystem.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -43,5 +44,11 @@ public class AdminController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
+    }
+
+    // 4) Get Dashboard Stats
+    @GetMapping("/dashboard-stats")
+    public ResponseEntity<DashboardStatsResponse> getDashboardStats() {
+        return ResponseEntity.ok(adminService.getDashboardStats());
     }
 }

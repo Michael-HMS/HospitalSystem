@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { AppointmentsService } from "../../../../services/appointment-service";
-import { DoctorsService } from "../../../../services/users-service";
+import { BillsService } from "../../../../services/payment-service";
 import Button from "../../../ui/button";
 import { TiCreditCard } from "react-icons/ti";
 
@@ -10,34 +9,13 @@ export default function BillingPage() {
   const isRtl = i18n.language === "ar";
 
   const [invoices, setInvoices] = useState<any[]>([]);
-  const [doctors, setDoctors] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const loggedInPatientId = 1;
-  const standardConsultationFee = 50.00; // Flat base fee mapping fallback
 
   useEffect(() => {
     const loadBillingData = async () => {
       try {
-        const [appsData, docsData] = await Promise.all([
-          AppointmentsService.getAllAppointments(),
-          DoctorsService.getAllDoctors()
-        ]);
-
-        const patientBills = (appsData || [])
-          .filter((app) => Number(app.patient_id) === loggedInPatientId)
-          .map((app) => ({
-            invoice_id: `INV-${app.appointment_id}109`,
-            appointment_id: app.appointment_id,
-            doctor_id: app.doctor_id,
-            date: app.appointment_date,
-            description: `${t("Clinical Outpatient Consultation Request")} — #${app.appointment_id}`,
-            amount: standardConsultationFee,
-            status: app.status === "completed" ? "paid" : "unpaid"
-          }));
-
+        const patientBills = await BillsService.getAllBills();
         setInvoices(patientBills);
-        setDoctors(docsData || []);
       } catch (error) {
         console.error("Error loading invoices:", error);
       } finally {
@@ -80,14 +58,13 @@ export default function BillingPage() {
             </thead>
             <tbody className="divide-y divide-slate/10">
               {invoices.map((inv) => {
-                const doc = doctors.find((d) => Number(d.doctor_id) === Number(inv.doctor_id));
                 const isPaid = inv.status === "paid";
 
                 return (
                   <tr key={inv.invoice_id} className="hover:bg-slate/5 transition-colors">
                     <td className="p-4 font-mono font-bold text-slate">{inv.invoice_id}</td>
                     <td className="p-4 font-semibold">
-                      {doc ? `Dr. ${doc.first_name} ${doc.last_name}` : `Staff #${inv.doctor_id}`}
+                      {inv.doctor_id}
                     </td>
                     <td className="p-4 text-slate">{inv.date}</td>
                     <td className="p-4 font-bold text-text-base">${inv.amount.toFixed(2)}</td>

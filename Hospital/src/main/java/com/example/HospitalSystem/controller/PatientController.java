@@ -6,6 +6,8 @@ import com.example.HospitalSystem.dto.PatientCreateRequest;
 import com.example.HospitalSystem.dto.PatientDto;
 import com.example.HospitalSystem.dto.PatientResponse;
 import com.example.HospitalSystem.dto.PrescriptionResponse;
+import com.example.HospitalSystem.dto.BillResponse;
+import com.example.HospitalSystem.dto.MedicalRecordResponse;
 import com.example.HospitalSystem.service.PatientService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -59,6 +61,15 @@ public class PatientController {
     // =========================================================================
 
     /**
+     * GET /api/patients/{patientId}/appointments
+     * Returns all appointments for a specific patient, newest first.
+     */
+    @GetMapping("/{patientId}/appointments")
+    public ResponseEntity<List<AppointmentResponse>> getPatientAppointments(@PathVariable Integer patientId) {
+        return ResponseEntity.ok(patientService.getPatientAppointments(patientId));
+    }
+
+    /**
      * POST /api/patients/{patientId}/appointments
      * Allows a patient to book a time slot with a specific doctor.
      */
@@ -81,5 +92,19 @@ public class PatientController {
         String requesterEmail = authentication != null ? authentication.getName() : null;
         return ResponseEntity.ok(
             patientService.getPatientPrescriptions(patientId, requesterEmail));
+    }
+
+    // =========================================================================
+    // Bills and Medical Records APIs
+    // =========================================================================
+
+    @GetMapping("/{patientId}/bills")
+    public ResponseEntity<List<BillResponse>> getPatientBills(@PathVariable Integer patientId) {
+        return ResponseEntity.ok(patientService.getPatientBills(patientId));
+    }
+
+    @GetMapping("/{patientId}/medical-records")
+    public ResponseEntity<List<MedicalRecordResponse>> getPatientMedicalRecords(@PathVariable Integer patientId) {
+        return ResponseEntity.ok(patientService.getPatientMedicalRecords(patientId));
     }
 }

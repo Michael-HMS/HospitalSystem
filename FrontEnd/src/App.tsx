@@ -3,6 +3,8 @@ import { Suspense, useEffect, useState } from 'react'
 import Navbar from './components/layout/navbar'
 import Footer from './components/layout/footer'
 import GlobalLoader from './components/ui/globalLoader'
+import Breadcrumbs from './components/ui/breadcrumbs'
+import ErrorBoundary from './components/ui/errorBoundary'
 import AppRoutes from './routes/app-routes'
 import { AuthService } from './services/auth-service'
 import { useLocation } from 'react-router-dom'
@@ -27,8 +29,11 @@ function App() {
     <Suspense fallback={<GlobalLoader />}>
     <div className="flex flex-col min-h-svh bg-background text-text-base">
       <Navbar role={role} onLogout={handleLogout} />
+      <Breadcrumbs />
       <main className="grow">
-        <AppRoutes />
+        <ErrorBoundary>
+          <AppRoutes />
+        </ErrorBoundary>
       </main>
       <Footer />
     </div>
