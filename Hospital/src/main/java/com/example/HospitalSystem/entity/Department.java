@@ -40,4 +40,24 @@ public class Department {
     @OneToMany(mappedBy = "department", fetch = FetchType.LAZY)
     @Builder.Default
     private List<Doctor> doctors = new ArrayList<>();
+
+    public void addDoctor(Doctor doctor) {
+        if (doctor == null) {
+            return;
+        }
+        if (!doctors.contains(doctor)) {
+            doctors.add(doctor);
+        }
+        doctor.setDepartment(this);
+    }
+
+    public void removeDoctor(Doctor doctor) {
+        if (doctor == null) {
+            return;
+        }
+        doctors.remove(doctor);
+        if (doctor.getDepartment() == this) {
+            doctor.setDepartment(null);
+        }
+    }
 }

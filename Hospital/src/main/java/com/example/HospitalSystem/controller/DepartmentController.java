@@ -5,6 +5,7 @@ import com.example.HospitalSystem.repository.DepartmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ public class DepartmentController {
      * Returns all departments with their basic info and doctor list.
      */
     @GetMapping
+    @Transactional(readOnly = true)
     public ResponseEntity<List<Map<String, Object>>> getAllDepartments() {
         List<Department> departments = departmentRepository.findAllWithDoctorsAndUsers();
 
@@ -57,6 +59,7 @@ public class DepartmentController {
      * Returns a single department by ID.
      */
     @GetMapping("/{id}")
+    @Transactional(readOnly = true)
     public ResponseEntity<?> getDepartmentById(@PathVariable Integer id) {
         return departmentRepository.findByIdWithDoctorsAndUsers(id)
                 .map(dept -> {

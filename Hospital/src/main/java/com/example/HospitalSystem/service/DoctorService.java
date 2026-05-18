@@ -133,6 +133,8 @@ public class DoctorService {
                                 .availabilityStatus(AvailabilityStatus.AVAILABLE)
                                 .build();
 
+                dept.addDoctor(doctor);
+
                 Doctor savedDoctor = doctorRepository.save(doctor);
                 return doctorMapper.entityToDto(savedDoctor);
         }

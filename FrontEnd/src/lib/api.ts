@@ -1,6 +1,6 @@
 import { AuthService } from "../services/auth-service";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://hospitalsystem-esdw.onrender.com/api";
 
 export class ApiError extends Error {
     status: number;
