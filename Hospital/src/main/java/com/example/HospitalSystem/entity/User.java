@@ -76,14 +76,7 @@ public class User {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
-    private Patient patient;
 
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
-    private Doctor doctor;
-
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
-    private Admin admin;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @Builder.Default

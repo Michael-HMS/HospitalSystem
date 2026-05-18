@@ -165,9 +165,10 @@ public class PatientService {
 
         // Second, check for double-booking on that specific date and time
         // We fetch all active appointments for that day (ignoring cancelled ones)
-        List<Appointment> dailyAppointments = appointmentRepository.findActiveAppointmentsByDoctorAndDate(
+        List<Appointment> dailyAppointments = appointmentRepository.findByDoctor_DoctorIdAndAppointmentDateAndStatusNot(
                 request.getDoctorId(), 
-                request.getAppointmentDate()
+                request.getAppointmentDate(),
+                AppointmentStatus.Cancelled
         );
 
         // Check if the requested time exactly matches or overlaps closely (assuming 30 min slots)
