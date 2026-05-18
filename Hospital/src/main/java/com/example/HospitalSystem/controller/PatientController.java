@@ -57,6 +57,15 @@ public class PatientController {
     // =========================================================================
 
     /**
+     * GET /api/patients/{patientId}/appointments
+     * Returns all appointments for a specific patient, newest first.
+     */
+    @GetMapping("/{patientId}/appointments")
+    public ResponseEntity<List<AppointmentResponse>> getPatientAppointments(@PathVariable Integer patientId) {
+        return ResponseEntity.ok(patientService.getPatientAppointments(patientId));
+    }
+
+    /**
      * POST /api/patients/{patientId}/appointments
      * Allows a patient to book a time slot with a specific doctor.
      */

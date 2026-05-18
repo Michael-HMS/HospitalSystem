@@ -1,25 +1,29 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { DoctorsService } from "../../../../services/users-service";
+import { AppointmentsService } from "../../../../services/appointment-service";
+import { AuthService } from "../../../../services/auth-service";
 import Button from "../../../ui/button";
 import { TiCalendar, TiTime, TiUser, TiNotes, TiChevronRight } from "react-icons/ti";
 
 export default function BookAppointmentPage() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const isRtl = i18n.language === "ar";
 
   const [doctors, setDoctors] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [submitError, setSubmitError] = useState("");
 
   // Form States
-  const [doctorId, setDoctorId] = useState("");
+  const [doctorId, setDoctorId] = useState(searchParams.get("doctorId") || "");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [reason, setReason] = useState("");
 
-  const loggedInPatientId = 1; // Connected to auth context ID
+  const loggedInPatientId = Number(AuthService.getId()) || 0;
 
   useEffect(() => {
     const fetchDoctors = async () => {
@@ -37,6 +41,7 @@ export default function BookAppointmentPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitError("");
 
     const payload = {
       patient_id: loggedInPatientId,
@@ -44,16 +49,15 @@ export default function BookAppointmentPage() {
       appointment_date: date,
       appointment_time: time,
       reason: reason,
-      status: "scheduled"
+      status: "Pending",
     };
 
     try {
-      console.log("Transmitting reservation payload:", payload);
-      // Calls your real endpoint dispatch method
-      // await AppointmentsService.createAppointment(payload);
+      await AppointmentsService.createAppointment(payload);
       navigate("/appointments");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Booking error:", error);
+      setSubmitError(error?.message || "Failed to book appointment. Please try again.");
     }
   };
 
@@ -132,13 +136,18 @@ export default function BookAppointmentPage() {
         </div>
 
         {/* Footer actions */}
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate/10">
-          <Button variant="secondary" size="medium" type="button" onClick={() => navigate(-1)}>
-            {t("Cancel")}
-          </Button>
-          <Button variant="primary" size="medium" type="submit" icon={<TiChevronRight className="w-4 h-4" />}>
-            {t("Confirm Booking")}
-          </Button>
+        <div className="flex flex-col gap-3 pt-4 border-t border-slate/10">
+          {submitError && (
+            <p className="text-red-500 text-xs text-center">⚠ {submitError}</p>
+          )}
+          <div className="flex items-center justify-end gap-3">
+            <Button variant="secondary" size="medium" type="button" onClick={() => navigate(-1)}>
+              {t("Cancel")}
+            </Button>
+            <Button variant="primary" size="medium" type="submit" icon={<TiChevronRight className="w-4 h-4" />}>
+              {t("Confirm Booking")}
+            </Button>
+          </div>
         </div>
       </form>
     </div>

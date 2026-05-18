@@ -112,6 +112,26 @@ public class PatientService {
     }
 
     /**
+     * Use case: A patient views their own appointment history.
+     * GET /api/patients/{patientId}/appointments
+     */
+    public List<AppointmentResponse> getPatientAppointments(Integer patientId) {
+        List<Appointment> appointments =
+                appointmentRepository.findByPatient_PatientIdOrderByAppointmentDateDescAppointmentTimeDesc(patientId);
+
+        return appointments.stream().map(a -> AppointmentResponse.builder()
+                .appointmentId(a.getAppointmentId())
+                .patientId(a.getPatient().getPatientId())
+                .patientName(a.getPatient().getUser().getFirstName() + " " + a.getPatient().getUser().getLastName())
+                .appointmentDate(a.getAppointmentDate())
+                .appointmentTime(a.getAppointmentTime())
+                .status(a.getStatus().name())
+                .reason(a.getReason())
+                .build()
+        ).collect(Collectors.toList());
+    }
+
+    /**
      * Use case: A patient books an appointment with a specific doctor.
      */
     @Transactional

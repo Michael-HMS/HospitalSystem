@@ -19,6 +19,8 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
 
     List<Appointment> findByDoctor_DoctorIdAndStatus(Integer doctorId, AppointmentStatus status);
 
+    List<Appointment> findByPatient_PatientIdOrderByAppointmentDateDescAppointmentTimeDesc(Integer patientId);
+
     @Query("SELECT a FROM Appointment a WHERE a.doctor.doctorId = :doctorId AND a.appointmentDate = :date AND a.status <> 'Cancelled'")
     List<Appointment> findActiveAppointmentsByDoctorAndDate(@Param("doctorId") Integer doctorId,
                                                             @Param("date") LocalDate date);

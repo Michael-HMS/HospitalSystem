@@ -2,6 +2,8 @@ import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "motion/react"
 import { useNavigate } from "react-router-dom"
 import Button from "../../ui/button"
+import { AuthService } from "../../../services/auth-service"
+import { ApiError } from "../../../lib/api"
 
 interface LoginData {
   email: string
@@ -76,6 +78,10 @@ const AuthPage: React.FC = () => {
   const [resetPassword, setResetPassword] = useState("")
   const [resetConfirm, setResetConfirm] = useState("")
   const [resetErrors, setResetErrors] = useState({ password: "", confirm: "" })
+
+  // ── API state ──
+  const [apiError, setApiError] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const strength = getPasswordStrength(resetPassword)
   const registerStrength = getPasswordStrength(registerData.password)
@@ -354,9 +360,32 @@ const AuthPage: React.FC = () => {
                   </div>
 
                   <Button variant="primary" size="large" className="w-full justify-center"
-                    onClick={() => { if (validateLogin()) console.log("Login submitted", loginData) }}>
-                    Login →
+                    onClick={async () => {
+                      if (!validateLogin()) return
+                      setApiError("")
+                      setIsSubmitting(true)
+                      try {
+                        const res = await AuthService.login(loginData.email, loginData.password)
+                        AuthService.storeSession(res.token, res.role, res.user)
+                        navigate("/home")
+                      } catch (err) {
+                        if (err instanceof ApiError) {
+                          setApiError(err.message)
+                        } else {
+                          setApiError("Login failed. Please try again.")
+                        }
+                      } finally {
+                        setIsSubmitting(false)
+                      }
+                    }}
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? "Logging in..." : "Login →"}
                   </Button>
+
+                  {apiError && authMode === "login" && (
+                    <p className="text-red-500 text-xs text-center">⚠ {apiError}</p>
+                  )}
 
                   <p className="text-center text-gray-400 text-sm md:hidden">
                     Don't have an account?{" "}
@@ -492,9 +521,34 @@ const AuthPage: React.FC = () => {
                   </div>
 
                   <Button variant="primary" size="large" className="w-full justify-center"
-                    onClick={() => { if (validateRegister()) console.log("Register submitted", registerData) }}>
-                    Create Account →
+                    onClick={async () => {
+                      if (!validateRegister()) return
+                      setApiError("")
+                      setIsSubmitting(true)
+                      try {
+                        await AuthService.register(registerData.name, registerData.email, registerData.password)
+                        // Auto-login after successful registration
+                        const res = await AuthService.login(registerData.email, registerData.password)
+                        AuthService.storeSession(res.token, res.role, res.user)
+                        navigate("/home")
+                      } catch (err) {
+                        if (err instanceof ApiError) {
+                          setApiError(err.message)
+                        } else {
+                          setApiError("Registration failed. Please try again.")
+                        }
+                      } finally {
+                        setIsSubmitting(false)
+                      }
+                    }}
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? "Creating account..." : "Create Account →"}
                   </Button>
+
+                  {apiError && authMode === "register" && (
+                    <p className="text-red-500 text-xs text-center">⚠ {apiError}</p>
+                  )}
 
                   <p className="text-center text-gray-400 text-sm md:hidden">
                     Already have an account?{" "}

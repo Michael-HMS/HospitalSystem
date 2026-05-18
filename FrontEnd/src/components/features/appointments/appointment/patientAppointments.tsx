@@ -58,10 +58,7 @@ export default function PatientAppointmentsPage() {
           DoctorsService.getAllDoctors()
         ]);
 
-        const allApps: ILocalAppointment[] = (appsData as any) || [];
-        const patientApps = allApps.filter(app => Number(app.patient_id) === loggedInPatientId);
-
-        setAppointments(patientApps);
+        setAppointments((appsData as any) || []);
         setDoctors(docsData || []);
       } catch (error) {
         console.error("Error loading patient records:", error);
