@@ -2,10 +2,13 @@ package com.example.HospitalSystem.service;
 
 import com.example.HospitalSystem.dto.PatientCreateRequest;
 import com.example.HospitalSystem.dto.PatientResponse;
+import com.example.HospitalSystem.dto.PrescriptionResponse;
 import com.example.HospitalSystem.entity.Patient;
+import com.example.HospitalSystem.entity.Prescription;
 import com.example.HospitalSystem.entity.User;
 import com.example.HospitalSystem.entity.enums.UserRole;
 import com.example.HospitalSystem.repository.PatientRepository;
+import com.example.HospitalSystem.repository.PrescriptionRepository;
 import com.example.HospitalSystem.repository.UserRepository;
 import com.example.HospitalSystem.dto.AppointmentRequest;
 import com.example.HospitalSystem.dto.AppointmentResponse;
@@ -17,9 +20,12 @@ import com.example.HospitalSystem.entity.enums.AvailabilityStatus;
 import com.example.HospitalSystem.mapper.PatientMapper;
 import com.example.HospitalSystem.repository.AppointmentRepository;
 import com.example.HospitalSystem.repository.DoctorRepository;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,14 +48,19 @@ public class PatientService {
     @Autowired
     private PatientMapper patientMapper;
 
+        @Autowired
+        private PrescriptionRepository prescriptionRepository;
+
     @Transactional
     public PatientResponse createPatient(PatientCreateRequest request) {
+        String hashedPassword = BCrypt.hashpw(request.getPassword(), BCrypt.gensalt());
+
         // 1. Build the base User entity
         User user = User.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .email(request.getEmail())
-                .passwordHash(request.getPassword()) // Note: Should be hashed with PasswordEncoder in reality
+                .passwordHash(hashedPassword)
                 .phone(request.getPhone())
                 .gender(request.getGender())
                 .dateOfBirth(request.getDateOfBirth())
@@ -172,6 +183,59 @@ public class PatientService {
                 .appointmentTime(savedAppointment.getAppointmentTime())
                 .status(savedAppointment.getStatus().name())
                 .reason(savedAppointment.getReason())
+                .build();
+    }
+
+    /**
+     * Returns prescriptions for a patient, but only if the requester owns the patient record.
+     */
+    @Transactional(readOnly = true)
+    public List<PrescriptionResponse> getPatientPrescriptions(Integer patientId, String requesterEmail) {
+        Patient patient = patientRepository.findById(patientId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Patient not found: " + patientId));
+
+        if (requesterEmail != null) {
+            User user = userRepository.findByEmail(requesterEmail)
+                    .orElseThrow(() -> new ResponseStatusException(
+                            HttpStatus.UNAUTHORIZED, "User not found for token subject"));
+
+            if (!patient.getUser().getUserId().equals(user.getUserId())) {
+                throw new ResponseStatusException(
+                        HttpStatus.FORBIDDEN, "Access denied: prescriptions are restricted to the owning patient");
+            }
+        }
+
+        return prescriptionRepository.findByPatient_PatientIdOrderByIssueDateDesc(patientId)
+                .stream()
+                .map(this::mapToPrescriptionResponse)
+                .collect(Collectors.toList());
+    }
+
+    private PrescriptionResponse mapToPrescriptionResponse(Prescription prescription) {
+        List<PrescriptionResponse.DetailResponse> details = prescription.getDetails().stream()
+                .map(d -> PrescriptionResponse.DetailResponse.builder()
+                        .detailId(d.getDetailId())
+                        .medicationId(d.getMedication().getMedicationId())
+                        .medicationName(d.getMedication().getMedicationName())
+                        .dosage(d.getDosage())
+                        .frequency(d.getFrequency())
+                        .duration(d.getDuration())
+                        .build())
+                .collect(Collectors.toList());
+
+        return PrescriptionResponse.builder()
+                .prescriptionId(prescription.getPrescriptionId())
+                .medicalRecordId(prescription.getMedicalRecord().getRecordId())
+                .patientId(prescription.getPatient().getPatientId())
+                .patientName(prescription.getPatient().getUser().getFirstName() + " "
+                        + prescription.getPatient().getUser().getLastName())
+                .doctorId(prescription.getDoctor().getDoctorId())
+                .doctorName(prescription.getDoctor().getUser().getFirstName() + " "
+                        + prescription.getDoctor().getUser().getLastName())
+                .issueDate(prescription.getIssueDate())
+                .notes(prescription.getNotes())
+                .details(details)
                 .build();
     }
 }

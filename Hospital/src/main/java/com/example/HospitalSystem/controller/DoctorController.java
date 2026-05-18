@@ -6,6 +6,8 @@ import com.example.HospitalSystem.dto.DoctorRegisterRequest;
 import com.example.HospitalSystem.dto.DoctorDto;
 import com.example.HospitalSystem.dto.MedicalRecordRequest;
 import com.example.HospitalSystem.dto.MedicalRecordResponse;
+import com.example.HospitalSystem.dto.MedicationCreateRequest;
+import com.example.HospitalSystem.dto.MedicationResponse;
 import com.example.HospitalSystem.dto.PatientProfileResponse;
 import com.example.HospitalSystem.dto.PrescriptionRequest;
 import com.example.HospitalSystem.dto.PrescriptionResponse;
@@ -185,6 +187,17 @@ public class DoctorController {
     // =========================================================================
     // Module 5 — Prescription Management
     // =========================================================================
+
+    /**
+     * POST /api/doctors/{doctorId}/medications
+     * Adds a medication to the catalog for prescribing.
+     */
+    @PostMapping("/{doctorId}/medications")
+    public ResponseEntity<MedicationResponse> createMedication(
+            @PathVariable Integer doctorId,
+            @Valid @RequestBody MedicationCreateRequest request) {
+        return ResponseEntity.ok(doctorService.createMedication(doctorId, request));
+    }
 
     /**
      * POST /api/doctors/{doctorId}/prescriptions

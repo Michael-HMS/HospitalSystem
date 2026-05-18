@@ -6,6 +6,8 @@ import com.example.HospitalSystem.dto.DoctorRegisterRequest;
 import com.example.HospitalSystem.dto.DoctorDto;
 import com.example.HospitalSystem.dto.MedicalRecordRequest;
 import com.example.HospitalSystem.dto.MedicalRecordResponse;
+import com.example.HospitalSystem.dto.MedicationCreateRequest;
+import com.example.HospitalSystem.dto.MedicationResponse;
 import com.example.HospitalSystem.dto.PatientProfileResponse;
 import com.example.HospitalSystem.dto.PrescriptionRequest;
 import com.example.HospitalSystem.dto.PrescriptionResponse;
@@ -362,6 +364,25 @@ public class DoctorService {
         }
 
         // =========================================================================
+        // Medication Catalog
+        // =========================================================================
+
+        @Transactional
+        public MedicationResponse createMedication(Integer doctorId, MedicationCreateRequest request) {
+                findDoctorOrThrow(doctorId);
+
+                Medication medication = Medication.builder()
+                                .medicationName(request.getMedicationName())
+                                .description(request.getDescription())
+                                .stockQuantity(request.getStockQuantity())
+                                .expiryDate(request.getExpiryDate())
+                                .price(request.getPrice())
+                                .build();
+
+                return mapToMedicationResponse(medicationRepository.save(medication));
+        }
+
+        // =========================================================================
         // Module 5 — Prescription Management
         // =========================================================================
 
@@ -534,6 +555,17 @@ public class DoctorService {
                                 .issueDate(p.getIssueDate())
                                 .notes(p.getNotes())
                                 .details(details)
+                                .build();
+        }
+
+        private MedicationResponse mapToMedicationResponse(Medication m) {
+                return MedicationResponse.builder()
+                                .medicationId(m.getMedicationId())
+                                .medicationName(m.getMedicationName())
+                                .description(m.getDescription())
+                                .stockQuantity(m.getStockQuantity())
+                                .expiryDate(m.getExpiryDate())
+                                .price(m.getPrice())
                                 .build();
         }
 

@@ -1,5 +1,7 @@
 package com.example.HospitalSystem.util;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -26,5 +28,31 @@ public class JwtUtil {
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(SECRET_KEY) // Sign with the secure key
                 .compact();
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            parseClaims(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    public String getEmailFromToken(String token) {
+        return parseClaims(token).getSubject();
+    }
+
+    public String getRoleFromToken(String token) {
+        Object role = parseClaims(token).get("role");
+        return role == null ? null : role.toString();
+    }
+
+    private Claims parseClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(SECRET_KEY)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 }

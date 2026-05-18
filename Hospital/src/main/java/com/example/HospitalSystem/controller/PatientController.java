@@ -5,8 +5,10 @@ import com.example.HospitalSystem.dto.AppointmentResponse;
 import com.example.HospitalSystem.dto.PatientCreateRequest;
 import com.example.HospitalSystem.dto.PatientDto;
 import com.example.HospitalSystem.dto.PatientResponse;
+import com.example.HospitalSystem.dto.PrescriptionResponse;
 import com.example.HospitalSystem.service.PatientService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -66,5 +68,18 @@ public class PatientController {
             @RequestBody AppointmentRequest request) {
         
         return ResponseEntity.ok(patientService.bookAppointment(patientId, request));
+    }
+
+    /**
+     * GET /api/patients/{patientId}/prescriptions
+     * Returns prescriptions only if the authenticated patient owns the record.
+     */
+    @GetMapping("/{patientId}/prescriptions")
+    public ResponseEntity<List<PrescriptionResponse>> getPrescriptions(
+            @PathVariable Integer patientId,
+            Authentication authentication) {
+        String requesterEmail = authentication != null ? authentication.getName() : null;
+        return ResponseEntity.ok(
+            patientService.getPatientPrescriptions(patientId, requesterEmail));
     }
 }
