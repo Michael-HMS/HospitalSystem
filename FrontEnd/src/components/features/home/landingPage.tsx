@@ -1,49 +1,5 @@
 import { useState } from "react"
 import { motion, AnimatePresence } from "motion/react"
-import { FaFacebookF, FaInstagram, FaTwitter } from "react-icons/fa"
-import Button from "../../ui/button"
-import { useNavigate } from "react-router-dom"
-
-// ==================== NAVBAR ====================
-const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false)
-  const navigate = useNavigate()
-  return (
-    <nav className="w-full bg-white shadow-sm px-8 py-4 flex items-center justify-between">
-      <div className="flex items-center gap-2">
-        <span className="text-green-500 text-2xl">🏥</span>
-        <span className="font-bold text-gray-800 text-xl">HMS</span>
-      </div>
-      <ul className="hidden md:flex items-center gap-8 text-gray-600 font-medium">
-        <li className="hover:text-green-500 cursor-pointer">Home</li>
-        <li className="hover:text-green-500 cursor-pointer">About</li>
-        <li className="hover:text-green-500 cursor-pointer">Doctors</li>
-        <li className="hover:text-green-500 cursor-pointer">Contact</li>
-      </ul>
-      <div className="hidden md:flex">
-        <Button variant="primary" size="medium" onClick={() => navigate("/auth")}>
-          🔒 Log In
-        </Button>
-      </div>
-      <button className="md:hidden text-gray-700 text-2xl" onClick={() => setIsOpen(!isOpen)}>
-        {isOpen ? "✕" : "☰"}
-      </button>
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="absolute top-16 left-0 w-full bg-white shadow-md flex flex-col items-center gap-4 py-6 md:hidden z-50"
-        >
-          <span className="text-gray-600 hover:text-green-500 cursor-pointer">Home</span>
-          <span className="text-gray-600 hover:text-green-500 cursor-pointer">About</span>
-          <span className="text-gray-600 hover:text-green-500 cursor-pointer">Doctors</span>
-          <span className="text-gray-600 hover:text-green-500 cursor-pointer">Contact</span>
-          <Button variant="primary" size="medium" onClick={() => navigate("/auth")}>Log In</Button>
-        </motion.div>
-      )}
-    </nav>
-  )
-}
 
 // ==================== HERO ====================
 const HeroSection = () => {
@@ -70,10 +26,6 @@ const HeroSection = () => {
             Navigating Health Together. Your Trusted Medical Resource.
             {/*{("home.hero.description")}*/}
           </p>
-          <Button variant="primary" size="medium">
-            📞 Book an Appointment
-            {/*{("home.hero.cta")}*/}
-          </Button>
         </motion.div>
         <motion.div
           initial={{ opacity: 0, x: 50 }}
@@ -93,7 +45,7 @@ const HeroSection = () => {
 // ==================== STATS ====================
 const StatsSection = () => {
   return (
-    <section className="w-full px-8 py-16 flex flex-col md:flex-row items-center gap-6">
+    <section className="w-full px-8 py-16 bg-white flex flex-col md:flex-row items-center gap-6">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -107,10 +59,6 @@ const StatsSection = () => {
         <p className="text-gray-500">Navigating Health Together. Your Trusted Medical Resource.</p>
         {/*{("home.stats.description")}*/}
         <div className="flex items-center gap-4">
-          <Button variant="primary" size="medium">Our Working Process</Button>
-          {/*{("home.stats.cta")}*/}
-          <Button variant="secondary" size="small">▶</Button>
-          {/*{("home.stats.cta")}*/}
         </div>
       </motion.div>
       <motion.div
@@ -127,7 +75,6 @@ const StatsSection = () => {
         <p className="text-gray-500 text-sm">Our Clients</p>
         <h3 className="text-3xl font-bold text-green-500">12K+</h3>
         <p className="text-gray-400 text-sm">Happy Clients</p>
-        <button className="text-green-500 text-sm font-medium">View Testimonial →</button>
       </motion.div>
       <motion.div
         initial={{ opacity: 0, y: 30 }}
@@ -143,6 +90,7 @@ const StatsSection = () => {
     </section>
   )
 }
+
 
 // ==================== SERVICES ====================
 type Service = { icon: string; title: string; description: string }
@@ -314,7 +262,6 @@ const DoctorsSection = () => {
                 <h3 className="text-lg font-bold text-gray-800">{doctor.name}</h3>
                 <p className="text-green-500 font-medium text-sm">{doctor.specialty}</p>
               </div>
-              <Button variant="secondary" size="small">Book Appointment</Button>
             </motion.div>
           ))}
         </AnimatePresence>
@@ -323,79 +270,15 @@ const DoctorsSection = () => {
   )
 }
 
-// ==================== FOOTER ====================
-const Footer = () => {
-  return (
-    <motion.footer
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="w-full bg-gray-800 text-white px-8 py-12"
-    >
-      <div className="flex flex-col md:flex-row justify-between gap-10">
-        <div className="flex flex-col gap-4 max-w-xs">
-          <div className="flex items-center gap-2">
-            <span className="text-green-400 text-2xl">🏥</span>
-            <span className="font-bold text-xl">HMS</span>
-          </div>
-          <p className="text-gray-400 text-sm">Navigating Health Together. Your Trusted Medical Resource.</p>
-          <div className="flex gap-3">
-            <button className="w-9 h-9 rounded-full bg-gray-700 hover:bg-blue-600 transition-colors flex items-center justify-center">
-              <FaFacebookF size={14} />
-            </button>
-            <button className="w-9 h-9 rounded-full bg-gray-700 hover:bg-pink-500 transition-colors flex items-center justify-center">
-              <FaInstagram size={14} />
-            </button>
-            <button className="w-9 h-9 rounded-full bg-gray-700 hover:bg-sky-500 transition-colors flex items-center justify-center">
-              <FaTwitter size={14} />
-            </button>
-          </div>
-        </div>
-        <div className="flex flex-col gap-4">
-          <h3 className="font-bold text-lg">Quick Links</h3>
-          <ul className="flex flex-col gap-2 text-gray-400 text-sm">
-            <li className="hover:text-green-400 cursor-pointer">Home</li>
-            <li className="hover:text-green-400 cursor-pointer">About</li>
-            <li className="hover:text-green-400 cursor-pointer">Doctors</li>
-            <li className="hover:text-green-400 cursor-pointer">Contact</li>
-          </ul>
-        </div>
-        <div className="flex flex-col gap-4">
-          <h3 className="font-bold text-lg">Services</h3>
-          <ul className="flex flex-col gap-2 text-gray-400 text-sm">
-            <li className="hover:text-green-400 cursor-pointer">Cardiology</li>
-            <li className="hover:text-green-400 cursor-pointer">Dentistry</li>
-            <li className="hover:text-green-400 cursor-pointer">Neurology</li>
-            <li className="hover:text-green-400 cursor-pointer">Orthopedics</li>
-          </ul>
-        </div>
-        <div className="flex flex-col gap-4">
-          <h3 className="font-bold text-lg">Contact Us</h3>
-          <ul className="flex flex-col gap-2 text-gray-400 text-sm">
-            <li>📍 Cairo, Egypt</li>
-            <li>📞 +20 123 456 7890</li>
-            <li>✉️ info@HMS.com</li>
-          </ul>
-        </div>
-      </div>
-      <div className="border-t border-gray-700 mt-10 pt-6 text-center text-gray-500 text-sm">
-        © 2026 HMS. All rights reserved.
-      </div>
-    </motion.footer>
-  )
-}
-
 // ==================== HOME PAGE ====================
 const HomePage = () => {
   return (
     <div>
-      <Navbar />
       <HeroSection />
       <StatsSection />
       <ServicesSection />
       <StepsSection />
       <DoctorsSection />
-      <Footer />
     </div>
   )
 }
