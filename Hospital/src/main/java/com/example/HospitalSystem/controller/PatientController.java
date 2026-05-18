@@ -5,6 +5,8 @@ import com.example.HospitalSystem.dto.AppointmentResponse;
 import com.example.HospitalSystem.dto.PatientCreateRequest;
 import com.example.HospitalSystem.dto.PatientDto;
 import com.example.HospitalSystem.dto.PatientResponse;
+import com.example.HospitalSystem.dto.BillResponse;
+import com.example.HospitalSystem.dto.MedicalRecordResponse;
 import com.example.HospitalSystem.service.PatientService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -75,5 +77,19 @@ public class PatientController {
             @RequestBody AppointmentRequest request) {
         
         return ResponseEntity.ok(patientService.bookAppointment(patientId, request));
+    }
+
+    // =========================================================================
+    // Bills and Medical Records APIs
+    // =========================================================================
+
+    @GetMapping("/{patientId}/bills")
+    public ResponseEntity<List<BillResponse>> getPatientBills(@PathVariable Integer patientId) {
+        return ResponseEntity.ok(patientService.getPatientBills(patientId));
+    }
+
+    @GetMapping("/{patientId}/medical-records")
+    public ResponseEntity<List<MedicalRecordResponse>> getPatientMedicalRecords(@PathVariable Integer patientId) {
+        return ResponseEntity.ok(patientService.getPatientMedicalRecords(patientId));
     }
 }

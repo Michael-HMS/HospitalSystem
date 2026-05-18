@@ -17,9 +17,16 @@ import com.example.HospitalSystem.entity.enums.AvailabilityStatus;
 import com.example.HospitalSystem.mapper.PatientMapper;
 import com.example.HospitalSystem.repository.AppointmentRepository;
 import com.example.HospitalSystem.repository.DoctorRepository;
+import com.example.HospitalSystem.repository.BillRepository;
+import com.example.HospitalSystem.repository.MedicalRecordRepository;
+import com.example.HospitalSystem.dto.BillResponse;
+import com.example.HospitalSystem.dto.MedicalRecordResponse;
+import com.example.HospitalSystem.entity.Bill;
+import com.example.HospitalSystem.entity.MedicalRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,6 +47,12 @@ public class PatientService {
     private AppointmentRepository appointmentRepository;
 
     @Autowired
+    private BillRepository billRepository;
+
+    @Autowired
+    private MedicalRecordRepository medicalRecordRepository;
+
+    @Autowired
     private PatientMapper patientMapper;
 
     @Transactional
@@ -49,7 +62,7 @@ public class PatientService {
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .email(request.getEmail())
-                .passwordHash(request.getPassword()) // Note: Should be hashed with PasswordEncoder in reality
+                .passwordHash(BCrypt.hashpw(request.getPassword(), BCrypt.gensalt()))
                 .phone(request.getPhone())
                 .gender(request.getGender())
                 .dateOfBirth(request.getDateOfBirth())
@@ -193,5 +206,36 @@ public class PatientService {
                 .status(savedAppointment.getStatus().name())
                 .reason(savedAppointment.getReason())
                 .build();
+    }
+
+    public List<BillResponse> getPatientBills(Integer patientId) {
+        List<Bill> bills = billRepository.findByPatient_PatientId(patientId);
+        return bills.stream().map(b -> BillResponse.builder()
+                .billId(b.getBillId())
+                .patientId(b.getPatient().getPatientId())
+                .totalAmount(b.getTotalAmount())
+                .paidAmount(b.getPaidAmount())
+                .status(b.getStatus())
+                .issuedDate(b.getIssuedDate())
+                .dueDate(b.getDueDate())
+                .build()
+        ).collect(Collectors.toList());
+    }
+
+    public List<MedicalRecordResponse> getPatientMedicalRecords(Integer patientId) {
+        List<MedicalRecord> records = medicalRecordRepository.findByPatient_PatientId(patientId);
+        return records.stream().map(r -> MedicalRecordResponse.builder()
+                .recordId(r.getRecordId())
+                .patientId(r.getPatient().getPatientId())
+                .patientName(r.getPatient().getUser().getFirstName() + " " + r.getPatient().getUser().getLastName())
+                .doctorId(r.getDoctor() != null ? r.getDoctor().getDoctorId() : null)
+                .doctorName(r.getDoctor() != null ? r.getDoctor().getUser().getFirstName() + " " + r.getDoctor().getUser().getLastName() : "Unknown")
+                .appointmentId(r.getAppointment() != null ? r.getAppointment().getAppointmentId() : null)
+                .diagnosis(r.getDiagnosis())
+                .treatment(r.getTreatment())
+                .notes(r.getNotes())
+                .createdAt(r.getCreatedAt())
+                .build()
+        ).collect(Collectors.toList());
     }
 }
